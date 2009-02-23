@@ -77,62 +77,86 @@ static CRLFPreprocessor CRLF;
 class EpsonPreprocessor: public ICharPreprocessor
 {
 protected:
-	enum PrinterState
+	enum InputState
 	{
-		Normal,
+		InputNormal,
+		Escape
+	};
+	
+	InputState m_InputState;
+	
+	enum EscapeState
+	{
+		Entered,
+		Underline
+	};
+	
+	EscapeState m_EscapeState;
+
+	enum FontSizeState
+	{
+		FontSizeNormal,
   		SingleLineExpanded,
   		Condensed
 	};
 	
-	PrinterState m_State;
-	
+	FontSizeState m_FontSizeState;
+		
 public:
 	EpsonPreprocessor():
-		m_State(Normal)
+		m_InputState(InputNormal),
+		m_FontSizeState(FontSizeNormal)
 	{}
 	
 	virtual void process(ICairoTTYProtected &ctty, gunichar c)
 	{
-		if (Unicode::iscntrl(c))
+		if (m_InputState == Escape)
+			handleEscape(ctty, c);
+		else if (Unicode::iscntrl(c))
 		{
 			// Control codes handled here
 			switch (c)
 			{
 				case 0x0e: // Expanded printing for one line
 					ctty.StretchFont(2.0);
-					m_State = SingleLineExpanded;
+					m_FontSizeState = SingleLineExpanded;
 					break;
 					
 				case 0x14: // Cancel one-line expanded printing
 					ctty.StretchFont(1.0);
-					m_State = Normal;
+					m_FontSizeState = FontSizeNormal;
 					break;
 					
 				case 0x0f: // Condensed printing
 					ctty.StretchFont(10.0/17.0); // Change from 10 CPI to 17 CPI
-					m_State = Condensed;
+					m_FontSizeState = Condensed;
 					break;
 					
 				case 0x12: // Cancel condensed printing
 					ctty.StretchFont(1.0);
-					m_State = Normal;
+					m_FontSizeState = FontSizeNormal;
 					break;
 					
-				case '\r':
+				case '\r': // Carriage Return
 					ctty.CarriageReturn();
 					break;
 					
-				case '\n':
-					if (m_State == SingleLineExpanded)
+				case '\n': // Line Feed
+					if (m_FontSizeState == SingleLineExpanded)
 					{
 						ctty.StretchFont(1.0);
-						m_State = Normal;
+						m_FontSizeState = FontSizeNormal;
 					}
 					ctty.LineFeed();
 					break;
 					
-				case 0x0c:
+				case 0x0c: // Form Feed
 					ctty.NewPage();
+					break;
+					
+				case 0x1b: // Escape
+					m_InputState = Escape;
+					m_EscapeState = Entered;
 					break;
 					
 				default:
@@ -143,6 +167,49 @@ public:
 		else
 			ctty.append(c);
 	}
+	
+	void handleEscape(ICairoTTYProtected &ctty, gunichar c)
+	{
+		// Determine what escape code follows
+		if (m_EscapeState == Entered)
+		{
+			switch (c)
+			{
+				case 0x2d: // Underline
+					m_EscapeState = Underline;
+					break;
+			
+				default:
+					std::cerr << "EpsonPreprocessor::handleEscape(): ignoring unknown escape ESC 0x" << std::hex << c << std::endl;
+					m_InputState = InputNormal; // Leave escape state
+			}
+			return;
+		}
+		
+		// For multi-byte escapes:
+		switch (m_EscapeState)
+		{
+			case Underline:	// ESC 0x2d u, turn underline off (0) or on (!0)
+				std::cerr << "escape: ESC 0x2d " << std::hex << c << std::endl;
+				if (c != 0)
+				{
+					// TODO: Set underline
+					std::cerr << "EpsonPreprocessor::hanleEscape(): Ignoring unsupportet escape: SET UNDERLINE" << std::endl;
+				}
+				else
+				{
+					// TODO: Cancel underline
+					std::cerr << "EpsonPreprocessor::hanleEscape(): Ignoring unsupportet escape: DROP UNDERLINE" << std::endl;
+				}
+				m_InputState = InputNormal; // Leave escape state
+				break;
+				
+			default:
+					std::cerr << "EpsonPreprocessor::handleEscape(): Internal error: entered unknown escape state " << m_EscapeState << std::endl;
+					abort();
+		}
+	}
+	
 private:
 	bool m_Escape;
 };
