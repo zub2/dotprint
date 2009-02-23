@@ -194,12 +194,12 @@ public:
 				if (c != 0)
 				{
 					// TODO: Set underline
-					std::cerr << "EpsonPreprocessor::hanleEscape(): Ignoring unsupportet escape: SET UNDERLINE" << std::endl;
+					//std::cerr << "EpsonPreprocessor::hanleEscape(): Ignoring unsupportet escape: SET UNDERLINE" << std::endl;
 				}
 				else
 				{
 					// TODO: Cancel underline
-					std::cerr << "EpsonPreprocessor::hanleEscape(): Ignoring unsupportet escape: DROP UNDERLINE" << std::endl;
+					//std::cerr << "EpsonPreprocessor::hanleEscape(): Ignoring unsupportet escape: DROP UNDERLINE" << std::endl;
 				}
 				m_InputState = InputNormal; // Leave escape state
 				break;
