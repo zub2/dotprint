@@ -159,7 +159,7 @@ public:
 					m_EscapeState = Entered;
 					break;
 					
-				default:
+				//default:
 					// Do what an epson printer does: Silently ignore the char (?)
 					// if (verbose)
 					//std::cerr << "EpsonPreprocessor::process(): ignoring unknown character 0x" << std::hex << c << std::endl; 
