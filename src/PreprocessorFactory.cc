@@ -190,7 +190,7 @@ public:
 		switch (m_EscapeState)
 		{
 			case Underline:	// ESC 0x2d u, turn underline off (0) or on (!0)
-				std::cerr << "escape: ESC 0x2d " << std::hex << c << std::endl;
+				//std::cerr << "escape: ESC 0x2d " << std::hex << c << std::endl;
 				if (c != 0)
 				{
 					// TODO: Set underline
