@@ -14,21 +14,24 @@ public:
 	ICharPreprocessor *GetPreprocessor() const;
 	const std::string &GetFontFace() const;
 	double GetFontSize() const;
-	
+
 protected:
 	void SetPageSize(const char *arg);
 	void SetPreprocessor(const char *arg);
 	void SetFontFace(const char *arg);
 	void SetFontSize(const char *arg);
-	
+
 	void PrintHelp();
 
 private:
-	static const struct option long_options[];
-	static const char *short_options;
-	
+	static const struct option LONG_OPTIONS[];
+	static const char *SHORT_OPTIONS;
+
+	static const char *DEFAULT_FONT_FACE;
+	static const double DEFAULT_FONT_SIZE;
+
 	const std::string m_ProgName;
-	
+
 	PageSize	m_PageSize;
 	bool		m_Landscape;
 	ICharPreprocessor *m_Preprocessor;
