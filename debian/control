@@ -1,0 +1,17 @@
+Source: dotprint
+Maintainer: David Kozub <zub@linux.fjfi.cvut.cz>
+Section: misc
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends: debhelper (>= 9), cmake (>= 2.8), libglibmm-2.4-dev, libcairomm-1.0-dev
+
+Package: dotprint
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Produce PDF output out of text files with dot matrix printer escapes.
+ This program inteprets some of the typical dot matrix printer escapes like
+ condensed and expanded font and produces a PDF rendering of the input.
+ .
+ Input is expected to be UTF-8 encoded. The original input is typically
+ encoded using some legacy 8bit encoding. When converting it to UTF-8
+ care must be taken to not corrupt the escape sequences.
