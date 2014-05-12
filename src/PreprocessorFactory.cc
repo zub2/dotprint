@@ -172,6 +172,8 @@ public:
 
     void handleEscape(ICairoTTYProtected &ctty, gunichar c)
     {
+        (void)ctty; // currently unused
+
         // Determine what escape code follows
         if (m_EscapeState == Entered)
         {
