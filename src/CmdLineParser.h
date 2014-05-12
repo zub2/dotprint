@@ -6,40 +6,40 @@
 class CmdLineParser
 {
 public:
-	CmdLineParser(int argc, char* const argv[]);
-	const PageSize &GetPageSize() const;
-	bool GetLandscape() const;
-	const std::string &GetOutputFile() const;
-	const std::string &GetInputFile() const;
-	ICharPreprocessor *GetPreprocessor() const;
-	const std::string &GetFontFace() const;
-	double GetFontSize() const;
+    CmdLineParser(int argc, char* const argv[]);
+    const PageSize &GetPageSize() const;
+    bool GetLandscape() const;
+    const std::string &GetOutputFile() const;
+    const std::string &GetInputFile() const;
+    ICharPreprocessor *GetPreprocessor() const;
+    const std::string &GetFontFace() const;
+    double GetFontSize() const;
 
 protected:
-	void SetPageSize(const char *arg);
-	void SetPreprocessor(const char *arg);
-	void SetFontFace(const char *arg);
-	void SetFontSize(const char *arg);
+    void SetPageSize(const char *arg);
+    void SetPreprocessor(const char *arg);
+    void SetFontFace(const char *arg);
+    void SetFontSize(const char *arg);
 
-	void PrintHelp();
+    void PrintHelp();
 
 private:
-	static const struct option LONG_OPTIONS[];
-	static const char *SHORT_OPTIONS;
+    static const struct option LONG_OPTIONS[];
+    static const char *SHORT_OPTIONS;
 
-	static const char *DEFAULT_FONT_FACE;
-	static const double DEFAULT_FONT_SIZE;
+    static const char *DEFAULT_FONT_FACE;
+    static const double DEFAULT_FONT_SIZE;
 
-	const std::string m_ProgName;
+    const std::string m_ProgName;
 
-	PageSize	m_PageSize;
-	bool		m_Landscape;
-	ICharPreprocessor *m_Preprocessor;
-	std::string m_OutputFile;
-	bool m_OutputFileSet;
-	std::string m_InputFile;
-	std::string m_FontFace;
-	double m_FontSize;
+    PageSize    m_PageSize;
+    bool        m_Landscape;
+    ICharPreprocessor *m_Preprocessor;
+    std::string m_OutputFile;
+    bool m_OutputFileSet;
+    std::string m_InputFile;
+    std::string m_FontFace;
+    double m_FontSize;
 };
 
 #endif /*CMDLINEPARSER_H_*/
