@@ -16,6 +16,12 @@ add_executable(dotprint
     PreprocessorFactory.h
 )
 target_link_libraries(dotprint ${DEPS_LIBRARIES})
-set_target_properties(dotprint PROPERTIES LINK_FLAGS "${DEPS_LDFLAGS_OTHER}")
+
+# pkg-config returns also transitional dependencies (i.e. what do glibmm and cairomm
+# depend on) but ld can handle it itself, there is no need we have a DT_NEEDED
+# entry for them. So use --as-needed to omit what's useless.
+# This also resolves the dpkg-shlibdeps warning:
+# dpkg-shlibdeps: warning: package could avoid a useless dependency
+set_target_properties(dotprint PROPERTIES LINK_FLAGS "-Wl,--as-needed ${DEPS_LDFLAGS_OTHER}")
 
 install(TARGETS dotprint RUNTIME DESTINATION bin)
