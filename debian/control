@@ -8,6 +8,7 @@ Build-Depends: debhelper (>= 9), cmake (>= 2.8), libglibmm-2.4-dev, libcairomm-1
 Package: dotprint
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: cp2utf8
 Description: Produce PDF output out of text files with dot matrix printer escapes.
  This program inteprets some of the typical dot matrix printer escapes like
  condensed and expanded font and produces a PDF rendering of the input.
