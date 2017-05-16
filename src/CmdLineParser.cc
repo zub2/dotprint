@@ -21,7 +21,6 @@
 #include <assert.h>
 #include <string.h>
 
-//#define _GNU_SOURCE
 #include <unistd.h>
 #include <getopt.h>
 
@@ -47,7 +46,7 @@ const char *CmdLineParser::DEFAULT_FONT_FACE = "Courier New";
 const double CmdLineParser::DEFAULT_FONT_SIZE = 11.0;
 
 CmdLineParser::CmdLineParser(int argc, char* const argv[]):
-    m_ProgName((argc>0 && argv[0] != NULL)? argv[0] : "dotprint"),
+    m_ProgName((argc>0 && argv[0] != nullptr)? argv[0] : "dotprint"),
     m_PageSize(PageSizeFactory::GetDefault()),
     m_Landscape(false),
     m_Preprocessor(PreprocessorFactory::GetDefault()),

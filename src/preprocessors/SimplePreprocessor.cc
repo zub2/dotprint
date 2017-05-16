@@ -17,22 +17,30 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PREPROCESSORFACTORY_H_
-#define PREPROCESSORFACTORY_H_
-
 #include <iostream>
-#include <string>
+#include <glibmm.h>
+#include "SimplePreprocessor.h"
 
-#include "CairoTTY.h"
-
-class PreprocessorFactory
+void SimplePreprocessor::process(ICairoTTYProtected &ctty, gunichar c)
 {
-public:
-    static void Print(std::ostream &s);
-    static ICharPreprocessor* Lookup(const std::string& name);
-    static ICharPreprocessor* GetDefault();
+    if (Glib::Unicode::iscntrl(c))
+    {
+        // Control codes handled here
+        switch (c)
+        {
+        case '\n':
+            ctty.NewLine();
+            break;
 
-    PreprocessorFactory() = delete;
-};
+        case 0x0c:
+            ctty.NewPage();
+            break;
 
-#endif /*PREPROCESSORFACTORY_H_*/
+        default:
+            std::cerr << "SimplePreprocessor::process(): ignoring unknown character 0x" << std::hex << c << std::endl;
+            //assert(0);
+        }
+    }
+    else
+        ctty.append(c);
+}

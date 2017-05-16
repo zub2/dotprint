@@ -17,22 +17,43 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PREPROCESSORFACTORY_H_
-#define PREPROCESSORFACTORY_H_
+#ifndef EPSON_PREPROCESSOR_H_
+#define EPSON_PREPROCESSOR_H_
 
-#include <iostream>
-#include <string>
+#include "../CairoTTY.h"
 
-#include "CairoTTY.h"
-
-class PreprocessorFactory
+class EpsonPreprocessor: public ICharPreprocessor
 {
 public:
-    static void Print(std::ostream &s);
-    static ICharPreprocessor* Lookup(const std::string& name);
-    static ICharPreprocessor* GetDefault();
+    EpsonPreprocessor();
+    virtual void process(ICairoTTYProtected &ctty, gunichar c) override;
 
-    PreprocessorFactory() = delete;
+private:
+    void handleEscape(ICairoTTYProtected &ctty, gunichar c);
+
+    enum class InputState
+    {
+        InputNormal,
+        Escape
+    };
+
+    enum class EscapeState
+    {
+        Entered,
+        Underline
+    };
+
+    enum class FontSizeState
+    {
+        FontSizeNormal,
+        SingleLineExpanded,
+        Condensed
+    };
+
+    InputState m_InputState;
+    EscapeState m_EscapeState;
+    FontSizeState m_FontSizeState;
+    bool m_Escape;
 };
 
-#endif /*PREPROCESSORFACTORY_H_*/
+#endif // EPSON_PREPROCESSOR_H_

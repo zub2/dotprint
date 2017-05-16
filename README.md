@@ -3,7 +3,7 @@ dotprint is a tool that can be used to convert text files that include escape se
 
 Nowadays you are not likely to come across such files often but they were common in the "bad old days" of DOS. Programs would often assume an "epson-compatible" dot matrix printer and would embed the escape sequences (for e.g. condensed or expanded font) into the output.
 
-If you want to use such files now, converting them into a PDF is quite useful. You can send them to others and you can print them out on other printers than just dot matrix printers.
+If you want to use such files now, converting them into PDF is quite useful. You can send them to others and you can print them out on other printers than just dot matrix printers. But please note that only a few escape sequences are supported. :-(
 
 So this might be useful to you if you are still running some DOS applications, perhaps in dosemu. With some scripting you can make the old DOS applications produce PDFs.
 
@@ -18,7 +18,7 @@ First you need to install the required dependencies. These are:
 
 In Debian/Ubuntu you can get them via:
 
-    apt-get install libglibmm-2.4-dev libcairomm-1.0-dev
+    apt install libglibmm-2.4-dev libcairomm-1.0-dev
 
 CMake is used for the build. It's possible to configure and build the program by:
 

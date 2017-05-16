@@ -92,11 +92,11 @@ public:
 
 class ICharPreprocessor
 {
-    public:
-        virtual void process(ICairoTTYProtected &ctty, gunichar c) = 0;
+public:
+    virtual void process(ICairoTTYProtected &ctty, gunichar c) = 0;
 
-        virtual ~ICharPreprocessor()
-        {}
+    virtual ~ICharPreprocessor()
+    {}
 };
 
 class CairoTTY: protected ICairoTTYProtected

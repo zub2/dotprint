@@ -17,22 +17,34 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PREPROCESSORFACTORY_H_
-#define PREPROCESSORFACTORY_H_
-
 #include <iostream>
-#include <string>
+#include <glibmm.h>
+#include "CRLFPreprocessor.h"
 
-#include "CairoTTY.h"
-
-class PreprocessorFactory
+void CRLFPreprocessor::process(ICairoTTYProtected &ctty, gunichar c)
 {
-public:
-    static void Print(std::ostream &s);
-    static ICharPreprocessor* Lookup(const std::string& name);
-    static ICharPreprocessor* GetDefault();
+    if (Glib::Unicode::iscntrl(c))
+    {
+        // Control codes handled here
+        switch (c)
+        {
+        case '\r':
+            ctty.CarriageReturn();
+            break;
 
-    PreprocessorFactory() = delete;
-};
+        case '\n':
+            ctty.LineFeed();
+            break;
 
-#endif /*PREPROCESSORFACTORY_H_*/
+        case 0x0c:
+            ctty.NewPage();
+            break;
+
+        default:
+            std::cerr << "CRLFPreprocessor::process(): ignoring unknown character 0x" << std::hex << c << std::endl;
+            //assert(0);
+        }
+    }
+    else
+        ctty.append(c);
+}

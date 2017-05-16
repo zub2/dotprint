@@ -21,15 +21,12 @@
 #include <assert.h>
 #include "CairoTTY.h"
 
-using namespace Glib;
-using namespace Cairo;
-
-CairoTTY::CairoTTY(Cairo::RefPtr<PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor):
+CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor):
     m_CairoSurface(cs),
     m_Margins(m),
     m_Preprocessor(preprocessor)
 {
-    m_Context = Context::create(m_CairoSurface);
+    m_Context = Cairo::Context::create(m_CairoSurface);
 
     SetPageSize(p);
     StretchFont(1.0, 1.0);
@@ -44,10 +41,10 @@ CairoTTY::~CairoTTY()
     m_CairoSurface->finish();
 }
 
-CairoTTY &CairoTTY::operator<<(const ustring &s)
+CairoTTY &CairoTTY::operator<<(const Glib::ustring &s)
 {
-    for (unsigned i = 0; i < s.length(); i++)
-        operator<<(s[i]);
+    for (gunichar c : s)
+        operator<<(c);
 
     return *this;
 }
@@ -67,7 +64,7 @@ void CairoTTY::SetPreprocessor(ICharPreprocessor *preprocessor)
     m_Preprocessor = preprocessor;
 }
 
-void CairoTTY::SetFont(const std::string &family, double size, FontSlant slant, FontWeight weight)
+void CairoTTY::SetFont(const std::string &family, double size, Cairo::FontSlant slant, Cairo::FontWeight weight)
 {
     assert(size > 0.0);
 
@@ -126,11 +123,11 @@ void CairoTTY::StretchFont(double stretch_x, double stretch_y)
 
 void CairoTTY::append(gunichar c)
 {
-    assert(!Unicode::iscntrl(c));
+    assert(!Glib::Unicode::iscntrl(c));
 
-    ustring s(1, c);
+    Glib::ustring s(1, c);
 
-    TextExtents t;
+    Cairo::TextExtents t;
     m_Context->get_text_extents(s, t);
     double x_advance = m_StretchX * t.x_advance;
 

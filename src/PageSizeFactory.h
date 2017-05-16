@@ -20,6 +20,8 @@
 #ifndef PAGESIZEFACTORY_H_
 #define PAGESIZEFACTORY_H_
 
+#include <iostream>
+#include <string>
 #include "CairoTTY.h"
 
 /*
@@ -32,27 +34,16 @@
  */
 
 /** \brief 1 cm in points. */
-const double milimeter = 72.0/25.4;
+constexpr double milimeter = 72.0/25.4;
 
 class PageSizeFactory
 {
 public:
     static void Print(std::ostream &s);
-    static const PageSize *Lookup(const char *name);
+    static const PageSize *Lookup(const std::string & name);
     static const PageSize &GetDefault();
 
-protected:
-    PageSizeFactory()
-    {}
-
-private:
-    struct Page
-    {
-        const char *name;
-        PageSize page;
-    };
-
-    static const Page m_Pages[];
+    PageSizeFactory() = delete;
 };
 
 #endif /*PAGESIZEFACTORY_H_*/

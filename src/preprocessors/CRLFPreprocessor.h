@@ -17,22 +17,15 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PREPROCESSORFACTORY_H_
-#define PREPROCESSORFACTORY_H_
+#ifndef CRLF_PREPROCESSOR_H_
+#define CRLF_PREPROCESSOR_H_
 
-#include <iostream>
-#include <string>
+#include "../CairoTTY.h"
 
-#include "CairoTTY.h"
-
-class PreprocessorFactory
+class CRLFPreprocessor: public ICharPreprocessor
 {
 public:
-    static void Print(std::ostream &s);
-    static ICharPreprocessor* Lookup(const std::string& name);
-    static ICharPreprocessor* GetDefault();
-
-    PreprocessorFactory() = delete;
+    virtual void process(ICairoTTYProtected &ctty, gunichar c) override;
 };
 
-#endif /*PREPROCESSORFACTORY_H_*/
+#endif // CRLF_PREPROCESSOR_H_
