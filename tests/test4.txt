@@ -1,0 +1,9 @@
+Testing font features
+=====================
+
+Regular text
+EBold textF
+4Italic text5
+E4Bold and italic text5F
+Regular text
+Regular 4Italic EBoth5 BoldF Regular

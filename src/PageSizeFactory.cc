@@ -62,6 +62,5 @@ const PageSize *PageSizeFactory::Lookup(const std::string& name)
 
 const PageSize &PageSizeFactory::GetDefault()
 {
-    //return *(PageSizes.begin()->second);
     return *DefaultPageSize;
 }
