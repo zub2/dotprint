@@ -203,16 +203,47 @@ void CmdLineParser::SetPageMargins(const char *arg)
 {
     double mtop, mright, mbottom, mleft;
 
-    if (sscanf(arg, "%lf,%lf,%lf,%lf", &mtop, &mright, &mbottom, &mleft) != 4)
+    if (!strcmp(arg, "formats"))
     {
-        std::cerr << m_ProgName << ": wrong margin specs: " << arg << std::endl;
-        return;
+        std::cout << m_ProgName << ": supported margin formats:" << std::endl << std::endl;
+        std::cout << "number:               one value for all margins." << std::endl;
+        std::cout << "num1,num2:            top & bottom, then left & right." << std::endl;
+        std::cout << "num1,num2,num3:       top, then left & right, then bottom." << std::endl;
+        std::cout << "num1,num2,num3,num4:  top, then right, then bottom, then left." << std::endl;
+        exit(0);
     }
 
-    m_PageMargins.m_Top = mtop * milimeter;
-    m_PageMargins.m_Right = mright * milimeter;
-    m_PageMargins.m_Bottom = mbottom * milimeter;
-    m_PageMargins.m_Left = mleft * milimeter;
+    switch (sscanf(arg, "%lf,%lf,%lf,%lf", &mtop, &mright, &mbottom, &mleft))
+    {
+        case 1:
+            m_PageMargins.m_Top = mtop * milimeter;
+            m_PageMargins.m_Right = mtop * milimeter;
+            m_PageMargins.m_Bottom = mtop * milimeter;
+            m_PageMargins.m_Left = mtop * milimeter;
+            break;
+        case 2:
+            m_PageMargins.m_Top = mtop * milimeter;
+            m_PageMargins.m_Right = mright * milimeter;
+            m_PageMargins.m_Bottom = mtop * milimeter;
+            m_PageMargins.m_Left = mright * milimeter;
+            break;
+        case 3:
+            m_PageMargins.m_Top = mtop * milimeter;
+            m_PageMargins.m_Right = mright * milimeter;
+            m_PageMargins.m_Bottom = mbottom * milimeter;
+            m_PageMargins.m_Left = mright * milimeter;
+            break;
+        case 4:
+            m_PageMargins.m_Top = mtop * milimeter;
+            m_PageMargins.m_Right = mright * milimeter;
+            m_PageMargins.m_Bottom = mbottom * milimeter;
+            m_PageMargins.m_Left = mleft * milimeter;
+            break;
+        default:
+            std::cerr << m_ProgName << ": wrong margin format: " << arg << std::endl;
+            std::cerr << m_ProgName << ": Use \"--margins formats\" to get a list of valid formats." << std::endl;
+            exit(1);
+    }
 }
 
 void CmdLineParser::SetPreprocessor(const char *arg)
@@ -263,8 +294,8 @@ void CmdLineParser::PrintHelp()
     std::cout << "                      Default value: \"" << DEFAULT_FONT_FACE << "\"" << std::endl;
     std::cout << "  -s, --font-size     Font size to use." << std::endl;
     std::cout << "                      Default value: " << DEFAULT_FONT_SIZE << std::endl;
-    std::cout << "  -m, --margins       Set page margins (in milimeters)." << std::endl;
-    std::cout << "                      Format: top,right,bottom,left (w/o units)" << std::endl;
+    std::cout << "  -m, --margins       Set page margins (in millimeters)." << std::endl;
+    std::cout << "                      Use \"-m formats\" to see available formats." << std::endl;
     std::cout << "                      Default value: " << MarginsFactory::DEFAULT_MARGIN_VALUE << " mm for all margins." << std::endl;
     std::cout << "  -h, --help          Display this help." << std::endl;
 }
