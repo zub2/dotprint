@@ -115,35 +115,40 @@ void CairoTTY::StretchFont(double stretch_x, double stretch_y)
     m_StretchY = stretch_y;
 }
 
-void CairoTTY::append(gunichar c)
+void CairoTTY::append(char c)
 {
     gunichar uc;
 
     if (m_CpTranslator->translate(c, uc))
     {
-        if (c == 0x09)
-        {
-            // TODO: tab handling
-            return;
-        }
-        Glib::ustring s(1, uc);
-
-        Cairo::TextExtents t;
-        m_Context->get_text_extents(s, t);
-        double x_advance = m_StretchX * t.x_advance;
-
-        if (m_Margins.m_Left + m_x + x_advance > m_PageSize.m_Width - m_Margins.m_Right)
-            NewLine(); // forced linebreak - text wraps to the next line
-
-        m_Context->save();
-        m_Context->move_to(m_Margins.m_Left + m_x, m_Margins.m_Top + m_y);
-        m_Context->scale(m_StretchX, m_StretchY);
-        m_Context->show_text(s);
-        m_Context->restore();
-
-        // We ignore y_advance, as we in no way can support
-        // vertical text layout.
-        m_x += x_advance;
+        append(uc);
     }
+}
+
+void CairoTTY::append(gunichar c)
+{
+    if (c == 0x09)
+    {
+        // TODO: tab handling
+        return;
+    }
+    Glib::ustring s(1, c);
+
+    Cairo::TextExtents t;
+    m_Context->get_text_extents(s, t);
+    double x_advance = m_StretchX * t.x_advance;
+
+    if (m_Margins.m_Left + m_x + x_advance > m_PageSize.m_Width - m_Margins.m_Right)
+        NewLine(); // forced linebreak - text wraps to the next line
+
+    m_Context->save();
+    m_Context->move_to(m_Margins.m_Left + m_x, m_Margins.m_Top + m_y);
+    m_Context->scale(m_StretchX, m_StretchY);
+    m_Context->show_text(s);
+    m_Context->restore();
+
+    // We ignore y_advance, as we in no way can support
+    // vertical text layout.
+    m_x += x_advance;
 }
 

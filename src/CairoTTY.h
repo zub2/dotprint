@@ -84,6 +84,7 @@ public:
     virtual void NewPage() = 0;
     virtual void StretchFont(double stretch_x, double stretch_y = 1.0) = 0;
 
+    virtual void append(char c) = 0;
     virtual void append(gunichar c) = 0;
 
     virtual ~ICairoTTYProtected()
@@ -133,6 +134,7 @@ public:
     virtual void StretchFont(double stretch_x, double stretch_y = 1.0);
 
 protected:
+    virtual void append(char c);
     virtual void append(gunichar c);
 
 private:
