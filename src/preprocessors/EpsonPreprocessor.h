@@ -26,7 +26,7 @@ class EpsonPreprocessor: public ICharPreprocessor
 {
 public:
     EpsonPreprocessor();
-    virtual void process(ICairoTTYProtected &ctty, char c) override;
+    virtual void process(ICairoTTYProtected &ctty, unsigned char c) override;
 
 private:
     void handleEscape(ICairoTTYProtected &ctty, gunichar c);

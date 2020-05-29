@@ -94,7 +94,7 @@ public:
 class ICharPreprocessor
 {
 public:
-    virtual void process(ICairoTTYProtected &ctty, char c) = 0;
+    virtual void process(ICairoTTYProtected &ctty, unsigned char c) = 0;
 
     virtual ~ICharPreprocessor()
     {}
@@ -116,7 +116,7 @@ public:
 
     virtual ~CairoTTY();
 
-    CairoTTY &operator<<(char c);
+    CairoTTY &operator<<(unsigned char c);
 
     void SetPreprocessor(ICharPreprocessor *preprocessor);
 

@@ -25,7 +25,7 @@
 class CRLFPreprocessor: public ICharPreprocessor
 {
 public:
-    virtual void process(ICairoTTYProtected &ctty, char c) override;
+    virtual void process(ICairoTTYProtected &ctty, unsigned char c) override;
 };
 
 #endif // CRLF_PREPROCESSOR_H_

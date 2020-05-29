@@ -21,7 +21,7 @@
 #include <glibmm.h>
 #include "CRLFPreprocessor.h"
 
-void CRLFPreprocessor::process(ICairoTTYProtected &ctty, char c)
+void CRLFPreprocessor::process(ICairoTTYProtected &ctty, unsigned char c)
 {
     if (iscntrl(c))
     {
@@ -46,5 +46,5 @@ void CRLFPreprocessor::process(ICairoTTYProtected &ctty, char c)
         }
     }
     else
-        ctty.append(c);
+        ctty.append((char) c);
 }

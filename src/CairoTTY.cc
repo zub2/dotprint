@@ -43,12 +43,12 @@ CairoTTY::~CairoTTY()
     m_CairoSurface->finish();
 }
 
-CairoTTY &CairoTTY::operator<<(char c)
+CairoTTY &CairoTTY::operator<<(unsigned char c)
 {
     if (m_Preprocessor)
         m_Preprocessor->process(*this, c);
     else
-        append(c);
+        append((char) c);
 
     return *this;
 }

@@ -54,7 +54,8 @@ int main(int argc, char *argv[])
     char c;
     while (!f.get(c).eof())
     {
-        ctty << c;
+        unsigned char uc = (unsigned char) c;
+        ctty << uc;
     }
 
     return 0;

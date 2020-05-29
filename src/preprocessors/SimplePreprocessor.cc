@@ -21,7 +21,7 @@
 #include <glibmm.h>
 #include "SimplePreprocessor.h"
 
-void SimplePreprocessor::process(ICairoTTYProtected &ctty, char c)
+void SimplePreprocessor::process(ICairoTTYProtected &ctty, unsigned char c)
 {
     if (iscntrl(c))
     {
@@ -42,5 +42,5 @@ void SimplePreprocessor::process(ICairoTTYProtected &ctty, char c)
         }
     }
     else
-        ctty.append(c);
+        ctty.append((char) c);
 }
