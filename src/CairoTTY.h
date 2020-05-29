@@ -93,7 +93,7 @@ public:
 class ICharPreprocessor
 {
 public:
-    virtual void process(ICairoTTYProtected &ctty, gunichar c) = 0;
+    virtual void process(ICairoTTYProtected &ctty, char c) = 0;
 
     virtual ~ICharPreprocessor()
     {}

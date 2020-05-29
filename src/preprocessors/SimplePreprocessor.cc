@@ -21,7 +21,7 @@
 #include <glibmm.h>
 #include "SimplePreprocessor.h"
 
-void SimplePreprocessor::process(ICairoTTYProtected &ctty, gunichar c)
+void SimplePreprocessor::process(ICairoTTYProtected &ctty, char c)
 {
     if (Glib::Unicode::iscntrl(c))
     {

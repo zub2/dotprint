@@ -21,7 +21,7 @@
 #include <glibmm.h>
 #include "CRLFPreprocessor.h"
 
-void CRLFPreprocessor::process(ICairoTTYProtected &ctty, gunichar c)
+void CRLFPreprocessor::process(ICairoTTYProtected &ctty, char c)
 {
     if (Glib::Unicode::iscntrl(c))
     {
