@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <iomanip>
 #include <glibmm.h>
 #include "EpsonPreprocessor.h"
 
@@ -86,7 +87,7 @@ void EpsonPreprocessor::process(ICairoTTYProtected &ctty, unsigned char c)
     }
 }
 
-void EpsonPreprocessor::handleEscape(ICairoTTYProtected &ctty, gunichar c)
+void EpsonPreprocessor::handleEscape(ICairoTTYProtected &ctty, char c)
 {
     (void)ctty; // currently unused
 
@@ -100,8 +101,12 @@ void EpsonPreprocessor::handleEscape(ICairoTTYProtected &ctty, gunichar c)
             break;
 
         default:
-            std::cerr << "EpsonPreprocessor::handleEscape(): ignoring unknown escape ESC 0x" << std::hex << c << std::endl;
-            m_InputState = InputState::InputNormal; // Leave escape state
+            {
+                int i = c;
+                std::cerr << "EpsonPreprocessor::handleEscape(): ignoring unknown escape ESC 0x"
+                    << std::setfill('0') << std::setw(2) << std::hex << i << std::endl;
+                m_InputState = InputState::InputNormal; // Leave escape state
+            }
         }
         return;
     }

@@ -29,7 +29,7 @@ public:
     virtual void process(ICairoTTYProtected &ctty, unsigned char c) override;
 
 private:
-    void handleEscape(ICairoTTYProtected &ctty, gunichar c);
+    void handleEscape(ICairoTTYProtected &ctty, char c);
 
     enum class InputState
     {
