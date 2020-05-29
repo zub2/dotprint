@@ -17,6 +17,8 @@
  */
 
 #include "CodepageTranslator.h"
+#include <iostream>
+#include <iomanip>
 
 CodepageTranslator::CodepageTranslator()
 {
@@ -62,8 +64,10 @@ bool CodepageTranslator::translate(unsigned char in, gunichar &out)
     }
     else
     {
+        int i = in;
         ret = false;
-        std::cout << "Droppping 0x" << std::hex << ((unsigned int) in) << std::endl;
+        std::cerr << "CodepageTranslator::translate(): Droppping unknown char 0x"
+            << std::setfill('0') << std::setw(2) << std::hex << i << std::endl;
     }
 
     return ret;
