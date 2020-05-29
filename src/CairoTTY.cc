@@ -20,6 +20,7 @@
 #include <iostream>
 #include <assert.h>
 #include "CairoTTY.h"
+#include "CodepageTranslator.h"
 
 CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor):
     m_CairoSurface(cs),
@@ -27,6 +28,7 @@ CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const
     m_Preprocessor(preprocessor)
 {
     m_Context = Cairo::Context::create(m_CairoSurface);
+    m_CpTranslator = new CodepageTranslator();
 
     SetPageSize(p);
     StretchFont(1.0, 1.0);
@@ -123,24 +125,33 @@ void CairoTTY::StretchFont(double stretch_x, double stretch_y)
 
 void CairoTTY::append(gunichar c)
 {
-    assert(!Glib::Unicode::iscntrl(c));
+    gunichar uc;
 
-    Glib::ustring s(1, c);
+    if (m_CpTranslator->translate(c, uc))
+    {
+        if (c == 0x09)
+        {
+            // TODO: tab handling
+            return;
+        }
+        Glib::ustring s(1, uc);
 
-    Cairo::TextExtents t;
-    m_Context->get_text_extents(s, t);
-    double x_advance = m_StretchX * t.x_advance;
+        Cairo::TextExtents t;
+        m_Context->get_text_extents(s, t);
+        double x_advance = m_StretchX * t.x_advance;
 
-    if (m_Margins.m_Left + m_x + x_advance > m_PageSize.m_Width - m_Margins.m_Right)
-        NewLine(); // forced linebreak - text wraps to the next line
+        if (m_Margins.m_Left + m_x + x_advance > m_PageSize.m_Width - m_Margins.m_Right)
+            NewLine(); // forced linebreak - text wraps to the next line
 
-    m_Context->save();
-    m_Context->move_to(m_Margins.m_Left + m_x, m_Margins.m_Top + m_y);
-    m_Context->scale(m_StretchX, m_StretchY);
-    m_Context->show_text(s);
-    m_Context->restore();
+        m_Context->save();
+        m_Context->move_to(m_Margins.m_Left + m_x, m_Margins.m_Top + m_y);
+        m_Context->scale(m_StretchX, m_StretchY);
+        m_Context->show_text(s);
+        m_Context->restore();
 
-    // We ignore y_advance, as we in no way can support
-    // vertical text layout.
-    m_x += x_advance;
+        // We ignore y_advance, as we in no way can support
+        // vertical text layout.
+        m_x += x_advance;
+    }
 }
+

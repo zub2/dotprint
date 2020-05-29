@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <fstream>
 #include <stdexcept>
 
 #include <assert.h>
@@ -38,7 +39,7 @@ public:
     {
         GError *err = nullptr;
 
-        m_io = g_io_channel_new_file(fname.c_str(), "r", &err);
+        m_io = new std::fstream(fname.c_str(), std::fstream::in | std::fstream::binary);
         if (!m_io)
         {
             assert(err != nullptr);
@@ -50,15 +51,14 @@ public:
     bool ReadUniChar(gunichar &c)
     {
         assert(m_io != nullptr);
-        GIOStatus status = g_io_channel_read_unichar(m_io, &c, nullptr);
+        char ch;
+        (*m_io).get(ch);
+        c = (unsigned char) ch;
 
-        if (status == G_IO_STATUS_NORMAL)
-            return true;
-
-        if (status == G_IO_STATUS_EOF)
+        if ((*m_io).eof())
             m_eof = true;
         else
-            throw std::runtime_error("can't read fron input file!");
+            return true;
 
         c = 0;
         return false;
@@ -72,11 +72,11 @@ public:
     ~UniFileStream()
     {
         assert(m_io != nullptr);
-        g_io_channel_shutdown (m_io, TRUE, nullptr);
+        (*m_io).close();
     }
 
 protected:
-    GIOChannel *m_io;
+    std::fstream *m_io;
     bool m_eof;
 };
 

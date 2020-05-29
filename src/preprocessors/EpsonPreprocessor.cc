@@ -32,7 +32,7 @@ void EpsonPreprocessor::process(ICairoTTYProtected &ctty, gunichar c)
 {
     if (m_InputState == InputState::Escape)
         handleEscape(ctty, c);
-    else if (Glib::Unicode::iscntrl(c))
+    else
     {
         // Control codes handled here
         switch (c)
@@ -79,15 +79,11 @@ void EpsonPreprocessor::process(ICairoTTYProtected &ctty, gunichar c)
             m_EscapeState = EscapeState::Entered;
             break;
 
-        //default:
-            // Do what an epson printer does: Silently ignore the char (?)
-            // if (verbose)
-            //std::cerr << "EpsonPreprocessor::process(): ignoring unknown character 0x" << std::hex << c << std::endl;
-            //assert(0);
+        default:
+            ctty.append(c);
+            break;
         }
     }
-    else
-        ctty.append(c);
 }
 
 void EpsonPreprocessor::handleEscape(ICairoTTYProtected &ctty, gunichar c)

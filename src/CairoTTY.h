@@ -99,6 +99,15 @@ public:
     {}
 };
 
+class ICodepageTranslator
+{
+public:
+    virtual bool translate(unsigned char in, gunichar &out) = 0;
+
+    virtual ~ICodepageTranslator()
+    {}
+};
+
 class CairoTTY: protected ICairoTTYProtected
 {
 public:
@@ -142,6 +151,7 @@ private:
     double m_StretchY;
 
     ICharPreprocessor *m_Preprocessor;
+    ICodepageTranslator *m_CpTranslator;
 };
 
 #endif /*CAIROTTY_H_*/
