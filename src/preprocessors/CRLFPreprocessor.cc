@@ -23,7 +23,7 @@
 
 void CRLFPreprocessor::process(ICairoTTYProtected &ctty, char c)
 {
-    if (Glib::Unicode::iscntrl(c))
+    if (iscntrl(c))
     {
         // Control codes handled here
         switch (c)
