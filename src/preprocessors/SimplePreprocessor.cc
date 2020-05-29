@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <iomanip>
 #include <glibmm.h>
 #include "SimplePreprocessor.h"
 
@@ -37,8 +38,11 @@ void SimplePreprocessor::process(ICairoTTYProtected &ctty, unsigned char c)
             break;
 
         default:
-            std::cerr << "SimplePreprocessor::process(): ignoring unknown character 0x" << std::hex << c << std::endl;
-            //assert(0);
+            {
+                int i = c;
+                std::cerr << "SimplePreprocessor::process(): ignoring unknown character 0x"
+                    << std::setfill('0') << std::setw(2) << std::hex << i << std::endl;
+            }
         }
     }
     else
