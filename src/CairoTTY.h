@@ -115,8 +115,7 @@ public:
 
     virtual ~CairoTTY();
 
-    CairoTTY &operator<<(const Glib::ustring &s);
-    CairoTTY &operator<<(gunichar c);
+    CairoTTY &operator<<(char c);
 
     void SetPreprocessor(ICharPreprocessor *preprocessor);
 

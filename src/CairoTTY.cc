@@ -43,15 +43,7 @@ CairoTTY::~CairoTTY()
     m_CairoSurface->finish();
 }
 
-CairoTTY &CairoTTY::operator<<(const Glib::ustring &s)
-{
-    for (gunichar c : s)
-        operator<<(c);
-
-    return *this;
-}
-
-CairoTTY &CairoTTY::operator<<(gunichar c)
+CairoTTY &CairoTTY::operator<<(char c)
 {
     if (m_Preprocessor)
         m_Preprocessor->process(*this, c);
