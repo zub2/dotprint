@@ -112,7 +112,7 @@ public:
 class CairoTTY: protected ICairoTTYProtected
 {
 public:
-    CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor);
+    CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor, ICodepageTranslator *translator);
 
     virtual ~CairoTTY();
 

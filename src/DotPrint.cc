@@ -38,13 +38,14 @@ int main(int argc, char *argv[])
         p.Landscape();
 
     ICharPreprocessor *preproc = cmdline.GetPreprocessor();
+    ICodepageTranslator *translator = cmdline.GetCodepageTranslator();
 
     Cairo::RefPtr<Cairo::PdfSurface> cs = Cairo::PdfSurface::create(cmdline.GetOutputFile(), p.m_Width, p.m_Height);
     assert(cs);
 
     Margins m(10.0 * milimeter,10.0 * milimeter,10.0 * milimeter);
 
-    CairoTTY ctty(cs, p, m, preproc);
+    CairoTTY ctty(cs, p, m, preproc, translator);
 
     // copy the file into ctty
     ctty.SetFont(cmdline.GetFontFace(), cmdline.GetFontSize(), Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL);

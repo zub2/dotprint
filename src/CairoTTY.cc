@@ -22,15 +22,13 @@
 #include "CairoTTY.h"
 #include "CodepageTranslator.h"
 
-CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor):
+CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor, ICodepageTranslator *translator):
     m_CairoSurface(cs),
     m_Margins(m),
-    m_Preprocessor(preprocessor)
+    m_Preprocessor(preprocessor),
+    m_CpTranslator(translator)
 {
     m_Context = Cairo::Context::create(m_CairoSurface);
-    auto transl = new CodepageTranslator();
-    transl->loadTable("");
-    m_CpTranslator = transl;
 
     SetPageSize(p);
     StretchFont(1.0, 1.0);
@@ -120,6 +118,12 @@ void CairoTTY::StretchFont(double stretch_x, double stretch_y)
 void CairoTTY::append(char c)
 {
     gunichar uc;
+
+    if (m_CpTranslator == nullptr)
+    {
+        std::cerr << "Please select codepage with -t" << std::endl;
+        exit(1);
+    }
 
     if (m_CpTranslator->translate(c, uc))
     {
