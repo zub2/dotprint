@@ -28,7 +28,7 @@ CodepageTranslator::CodepageTranslator()
 CodepageTranslator::~CodepageTranslator()
 {
 }
-#include <iostream>
+
 bool CodepageTranslator::translate(unsigned char in, gunichar &out)
 {
     bool ret = false;
