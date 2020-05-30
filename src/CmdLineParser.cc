@@ -252,6 +252,7 @@ void CmdLineParser::PrintHelp()
     std::cout << "  -l, --landscape     Set landscape mode." << std::endl;
     std::cout << "  -P, --preprocessor  Select preprocessor to use." << std::endl;
     std::cout << "                      Use \"-P list\" to see available values." << std::endl;
+    std::cout << "  -t, --translator    Select codepage translator to use." << std::endl;
     std::cout << "  -f, --font-face     Font to use." << std::endl;
     std::cout << "                      Default value: \"" << DEFAULT_FONT_FACE << "\"" << std::endl;
     std::cout << "  -s, --font-size     Font size to use." << std::endl;
