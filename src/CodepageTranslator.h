@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2020 Peter Kessen
  *
  * This file is part of dotprint.
  *
