@@ -18,6 +18,7 @@
  */
 
 #include "CodepageTranslator.h"
+#include <fstream>
 #include <iostream>
 #include <iomanip>
 
@@ -27,6 +28,12 @@ CodepageTranslator::CodepageTranslator()
 
 CodepageTranslator::~CodepageTranslator()
 {
+}
+
+void CodepageTranslator::loadTable(std::string const& tableName)
+{
+    m_table.clear();
+    m_table.insert({(unsigned char)0x09, (gunichar)0x09});
 }
 
 bool CodepageTranslator::translate(unsigned char in, gunichar &out)

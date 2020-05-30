@@ -28,7 +28,9 @@ CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const
     m_Preprocessor(preprocessor)
 {
     m_Context = Cairo::Context::create(m_CairoSurface);
-    m_CpTranslator = new CodepageTranslator();
+    auto transl = new CodepageTranslator();
+    transl->loadTable("");
+    m_CpTranslator = transl;
 
     SetPageSize(p);
     StretchFont(1.0, 1.0);

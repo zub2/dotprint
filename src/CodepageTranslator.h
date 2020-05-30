@@ -19,6 +19,7 @@
 
 #include <map>
 #include <sstream>
+#include <string>
 #include "CairoTTY.h"
 
 class CodepageTranslator : public ICodepageTranslator
@@ -27,10 +28,12 @@ public:
     CodepageTranslator();
     virtual ~CodepageTranslator();
 
+    void loadTable(std::string const& tableName);
+
     virtual bool translate(unsigned char in, gunichar &out);
 
 private:
-    typedef std::map<char, std::string> TTransTable;
+    typedef std::map<unsigned char, gunichar> TTransTable;
 
     TTransTable m_table;
 };
