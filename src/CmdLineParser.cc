@@ -27,6 +27,7 @@
 #include "CmdLineParser.h"
 #include "PageSizeFactory.h"
 #include "PreprocessorFactory.h"
+#include "CodepageTranslator.h"
 
 const struct option CmdLineParser::LONG_OPTIONS[] =
 {
@@ -34,13 +35,14 @@ const struct option CmdLineParser::LONG_OPTIONS[] =
     {"landscape",   no_argument,        0,  'l'},
     {"output",      required_argument,  0,  'o'},
     {"preprocessor",required_argument,  0,  'P'},
+    {"translator",  required_argument,  0,  't'},
     {"font-face",   required_argument,  0,  'f'},
     {"font-size",   required_argument,  0,  's'},
     {"help",        no_argument,        0,  'h'},
     { 0, 0, 0, 0 }
 };
 
-const char *CmdLineParser::SHORT_OPTIONS="p:lo:P:h";
+const char *CmdLineParser::SHORT_OPTIONS="p:lo:P:t:h";
 
 const char *CmdLineParser::DEFAULT_FONT_FACE = "Courier New";
 const double CmdLineParser::DEFAULT_FONT_SIZE = 11.0;
@@ -50,6 +52,7 @@ CmdLineParser::CmdLineParser(int argc, char* const argv[]):
     m_PageSize(PageSizeFactory::GetDefault()),
     m_Landscape(false),
     m_Preprocessor(PreprocessorFactory::GetDefault()),
+    m_Translator(nullptr),
     m_OutputFileSet(false),
     m_FontFace(DEFAULT_FONT_FACE),
     m_FontSize(DEFAULT_FONT_SIZE)
@@ -83,6 +86,11 @@ CmdLineParser::CmdLineParser(int argc, char* const argv[]):
         case 'P':
             // Set preprocessor
             SetPreprocessor(optarg);
+            break;
+
+        case 't':
+            // Set codepage translator
+            SetTranslator(optarg);
             break;
 
         case 'f':
@@ -146,6 +154,11 @@ ICharPreprocessor *CmdLineParser::GetPreprocessor() const
     return m_Preprocessor;
 }
 
+ICodepageTranslator *CmdLineParser::GetCodepageTranslator() const
+{
+    return m_Translator;
+}
+
 const std::string &CmdLineParser::GetOutputFile() const
 {
     return m_OutputFile;
@@ -204,6 +217,15 @@ void CmdLineParser::SetPreprocessor(const char *arg)
     }
 
     m_Preprocessor = p;
+}
+
+void CmdLineParser::SetTranslator(const char *arg)
+{
+    CodepageTranslator *t = new CodepageTranslator();
+
+    t->loadTable(arg);
+
+    m_Translator = t;
 }
 
 void CmdLineParser::SetFontFace(const char *arg)
