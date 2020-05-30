@@ -20,6 +20,7 @@
 #include "CodepageTranslator.h"
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <iomanip>
 
 CodepageTranslator::CodepageTranslator()
@@ -32,16 +33,52 @@ CodepageTranslator::~CodepageTranslator()
 
 void CodepageTranslator::loadTable(std::string const& tableName)
 {
+    std::fstream f(tableName, std::fstream::in);
+    std::string line;
+
     m_table.clear();
-    m_table.insert({(unsigned char)0x09, (gunichar)0x09});
-    for (unsigned char i=21; i < 127; ++i)
+
+    if (!f.is_open())
     {
-        m_table.insert({i, (gunichar)i});
+        std::cerr << "Unable to load translation file: " << tableName << std::endl;
+        exit(1);
     }
-    m_table.insert({(unsigned char)0x81, (gunichar)0x00fc});
-    m_table.insert({(unsigned char)0x84, (gunichar)0x00e4});
-    m_table.insert({(unsigned char)0xc4, (gunichar)0x2500});
-    m_table.insert({(unsigned char)0xe1, (gunichar)0x00df});
+
+    while (std::getline(f, line))
+    {
+        auto startText = line.find_first_not_of(" \t");
+        if (startText == std::string::npos)
+        {
+            std::cout << "Skipping empty line" << std::endl;
+            continue;
+        }
+        auto startComment = line.find_first_of("#", startText);
+
+        auto text = line.substr(startText, startComment - startText);
+        if (text.length() > 0)
+        {
+            std::stringstream ss1(text);
+            unsigned int c;
+            std::string uni;
+
+            ss1 >> std::hex >> c >> uni;
+            if (c > 0xFF)
+            {
+                std::cerr << "Could not parse line. Character value to high: " << text << std::endl;
+                exit(1);
+            }
+            unsigned char ch = (unsigned char) c;
+            if (uni.substr(0, 2) != "U+")
+            {
+                std::cerr << "Could not parse line. Unicode value not correctly formatted: " << text << std::endl;
+                exit(1);
+            }
+            std::stringstream ss2(uni.substr(2));
+            gunichar unichar;
+            ss2 >> std::hex >> unichar;
+            m_table.insert({ch, unichar});
+        }
+    }
 }
 
 bool CodepageTranslator::translate(unsigned char in, gunichar &out)
