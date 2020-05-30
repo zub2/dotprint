@@ -49,7 +49,7 @@ void CodepageTranslator::loadTable(std::string const& tableName)
         auto startText = line.find_first_not_of(" \t");
         if (startText == std::string::npos)
         {
-            std::cout << "Skipping empty line" << std::endl;
+            // Skip empty line (only comment)
             continue;
         }
         auto startComment = line.find_first_of("#", startText);
