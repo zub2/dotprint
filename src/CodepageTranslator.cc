@@ -34,41 +34,25 @@ void CodepageTranslator::loadTable(std::string const& tableName)
 {
     m_table.clear();
     m_table.insert({(unsigned char)0x09, (gunichar)0x09});
+    for (unsigned char i=21; i < 127; ++i)
+    {
+        m_table.insert({i, (gunichar)i});
+    }
+    m_table.insert({(unsigned char)0x81, (gunichar)0x00fc});
+    m_table.insert({(unsigned char)0x84, (gunichar)0x00e4});
+    m_table.insert({(unsigned char)0xc4, (gunichar)0x2500});
+    m_table.insert({(unsigned char)0xe1, (gunichar)0x00df});
 }
 
 bool CodepageTranslator::translate(unsigned char in, gunichar &out)
 {
     bool ret = false;
+    auto search = m_table.find(in);
 
-    if (in >= 21 && in < 127)
+    if (search != m_table.end())
     {
+        out = search->second;
         ret = true;
-        out = in;
-    }
-    else if (in == 9) // Tab
-    {
-        ret = true;
-        out = in;
-    }
-    else if (in == 0x81)
-    {
-        ret = true;
-        out = 0x00fc;
-    }
-    else if (in == 0x84)
-    {
-        ret = true;
-        out = 0x00e4;
-    }
-    else if (in == 0xc4)
-    {
-        ret = true;
-        out = 0x2500;
-    }
-    else if (in == 0xe1)
-    {
-        ret = true;
-        out = 0x00df;
     }
     else
     {
