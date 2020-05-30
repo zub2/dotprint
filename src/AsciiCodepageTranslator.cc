@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Peter Kessen
+ * Copyright (C) 2020 Peter Kessen <p.kessen at kessen-peter.de>
  *
  * This file is part of dotprint.
  *
