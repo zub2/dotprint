@@ -20,6 +20,7 @@
 #include <iostream>
 #include <assert.h>
 #include "CairoTTY.h"
+#include "AsciiCodepageTranslator.h"
 #include "CodepageTranslator.h"
 
 CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor, ICodepageTranslator *translator):
@@ -121,8 +122,7 @@ void CairoTTY::append(char c)
 
     if (m_CpTranslator == nullptr)
     {
-        std::cerr << "Please select codepage with -t" << std::endl;
-        exit(1);
+        m_CpTranslator = new AsciiCodepageTranslator();
     }
 
     if (m_CpTranslator->translate(c, uc))

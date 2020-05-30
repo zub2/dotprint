@@ -8,6 +8,8 @@ add_executable(dotprint
     CmdLineParser.h
     CairoTTY.cc
     CairoTTY.h
+    AsciiCodepageTranslator.cc
+    AsciiCodepageTranslator.h
     CodepageTranslator.cc
     CodepageTranslator.h
     PageSizeFactory.cc
