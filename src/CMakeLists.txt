@@ -12,6 +12,8 @@ add_executable(dotprint
     AsciiCodepageTranslator.h
     CodepageTranslator.cc
     CodepageTranslator.h
+    MarginsFactory.cc
+    MarginsFactory.h
     PageSizeFactory.cc
     PageSizeFactory.h
     PreprocessorFactory.cc

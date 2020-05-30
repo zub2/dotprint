@@ -25,6 +25,10 @@
 
 CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor, ICodepageTranslator *translator):
     m_CairoSurface(cs),
+    m_FontName("Courier New"),
+    m_FontSize(10.0),
+    m_FontWeight(FontWeight::Normal),
+    m_FontSlant(FontSlant::Normal),
     m_Margins(m),
     m_Preprocessor(preprocessor),
     m_CpTranslator(translator)
@@ -32,8 +36,9 @@ CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const
     m_Context = Cairo::Context::create(m_CairoSurface);
 
     SetPageSize(p);
+
     StretchFont(1.0, 1.0);
-    SetFont("Courier New", 10.0);
+    UseCurrentFont();
 
     Home();
 }
@@ -67,6 +72,34 @@ void CairoTTY::SetFont(const std::string &family, double size, Cairo::FontSlant 
     m_Context->set_font_size(size);
 
     m_Context->get_font_extents(m_FontExtents);
+}
+
+void CairoTTY::UseCurrentFont()
+{
+    Cairo::FontWeight weight;
+    Cairo::FontSlant slant;
+
+    switch (m_FontWeight)
+    {
+        case FontWeight::Bold:
+            weight = Cairo::FONT_WEIGHT_BOLD;
+            break;
+        default:
+            weight = Cairo::FONT_WEIGHT_NORMAL;
+            break;
+    }
+
+    switch (m_FontSlant)
+    {
+        case FontSlant::Italic:
+            slant = Cairo::FONT_SLANT_ITALIC;
+            break;
+        default:
+            slant = Cairo::FONT_SLANT_NORMAL;
+            break;
+    }
+
+    SetFont(m_FontName, m_FontSize, slant, weight);
 }
 
 void CairoTTY::SetPageSize(const PageSize &p)
@@ -108,6 +141,26 @@ void CairoTTY::NewPage()
 {
     m_Context->show_page();
     Home();
+}
+
+void CairoTTY::SetFontName(const std::string family)
+{
+    m_FontName = family;
+}
+
+void CairoTTY::SetFontSize(const double size)
+{
+    m_FontSize = size;
+}
+
+void CairoTTY::SetFontWeight(const FontWeight weight)
+{
+    m_FontWeight = weight;
+}
+
+void CairoTTY::SetFontSlant(const FontSlant slant)
+{
+    m_FontSlant = slant;
 }
 
 void CairoTTY::StretchFont(double stretch_x, double stretch_y)

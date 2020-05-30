@@ -89,13 +89,23 @@ void EpsonPreprocessor::process(ICairoTTYProtected &ctty, unsigned char c)
 
 void EpsonPreprocessor::handleEscape(ICairoTTYProtected &ctty, char c)
 {
-    (void)ctty; // currently unused
-
     // Determine what escape code follows
     if (m_EscapeState == EscapeState::Entered)
     {
         switch (c)
         {
+        case 0x45: // Set bold
+            ctty.SetFontWeight(FontWeight::Bold);
+            break;
+        case 0x46: // Unset bold
+            ctty.SetFontWeight(FontWeight::Normal);
+            break;
+        case 0x34: // Set italic
+            ctty.SetFontSlant(FontSlant::Italic);
+            break;
+        case 0x35: // Unset italic
+            ctty.SetFontSlant(FontSlant::Normal);
+            break;
         case 0x2d: // Underline
             m_EscapeState = EscapeState::Underline;
             break;
@@ -108,6 +118,21 @@ void EpsonPreprocessor::handleEscape(ICairoTTYProtected &ctty, char c)
                 m_InputState = InputState::InputNormal; // Leave escape state
             }
         }
+
+        /*
+         * If still in the escape state (no change to special), assume
+         * the operation has completed, and exit the escape state.
+         *
+         * This includes the error condition, as no change is done either.
+         */
+        if (m_EscapeState == EscapeState::Entered)
+        {
+            m_InputState = InputState::InputNormal;
+        }
+
+        // Allow font to update if it has changed.
+        ctty.UseCurrentFont();
+
         return;
     }
 

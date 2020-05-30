@@ -43,12 +43,14 @@ int main(int argc, char *argv[])
     Cairo::RefPtr<Cairo::PdfSurface> cs = Cairo::PdfSurface::create(cmdline.GetOutputFile(), p.m_Width, p.m_Height);
     assert(cs);
 
-    Margins m(10.0 * milimeter,10.0 * milimeter,10.0 * milimeter);
+    Margins m = cmdline.GetPageMargins();
 
     CairoTTY ctty(cs, p, m, preproc, translator);
 
-    // copy the file into ctty
-    ctty.SetFont(cmdline.GetFontFace(), cmdline.GetFontSize(), Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL);
+    // Set the font
+    ctty.SetFontName(cmdline.GetFontFace());
+    ctty.SetFontSize(cmdline.GetFontSize());
+    ctty.UseCurrentFont();
 
     std::fstream f(cmdline.GetInputFile(), std::fstream::in | std::fstream::binary);
     assert(f.is_open());
