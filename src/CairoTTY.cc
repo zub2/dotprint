@@ -138,6 +138,11 @@ void CairoTTY::append(gunichar c)
         // TODO: tab handling
         return;
     }
+    else if (Glib::Unicode::iscntrl(c))
+    {
+        std::cout << "Cannot print character 0x" << std::hex << c << std::endl;
+        return;
+    }
     Glib::ustring s(1, c);
 
     Cairo::TextExtents t;
