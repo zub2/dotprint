@@ -25,11 +25,19 @@ namespace
 {
     PageSize PageSizeA4(210.0 * milimeter, 297.0 * milimeter);
     PageSize PageSizeA5(148.5 * milimeter, 210.0 * milimeter);
+    PageSize PageSizeLetter(215.9 * milimeter, 279.4 * milimeter);
+    PageSize PageSizeHalfLetter(139.7 * milimeter, 215.9 * milimeter);
+    PageSize PageSizeLegal(215.9 * milimeter, 355.6 * milimeter);
+    PageSize PageSizeOficio(215.9 * milimeter, 340.36 * milimeter);
 
     const std::map<std::string, PageSize*> PageSizes =
     {
         { "A4", &PageSizeA4 },
-        { "A5", &PageSizeA5 }
+        { "A5", &PageSizeA5 },
+        { "Letter", &PageSizeLetter },
+        { "Half Letter", &PageSizeHalfLetter },
+        { "Legal", &PageSizeLegal },
+        { "Oficio", &PageSizeOficio }
     };
 
     PageSize* DefaultPageSize = &PageSizeA4;
@@ -54,5 +62,5 @@ const PageSize *PageSizeFactory::Lookup(const std::string& name)
 
 const PageSize &PageSizeFactory::GetDefault()
 {
-    return *(PageSizes.begin()->second);
+    return *DefaultPageSize;
 }

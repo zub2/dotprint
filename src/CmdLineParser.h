@@ -27,6 +27,7 @@ class CmdLineParser
 public:
     CmdLineParser(int argc, char* const argv[]);
     const PageSize &GetPageSize() const;
+    const Margins &GetPageMargins() const;
     bool GetLandscape() const;
     const std::string &GetOutputFile() const;
     const std::string &GetInputFile() const;
@@ -36,6 +37,7 @@ public:
 
 protected:
     void SetPageSize(const char *arg);
+    void SetPageMargins(const char *arg);
     void SetPreprocessor(const char *arg);
     void SetFontFace(const char *arg);
     void SetFontSize(const char *arg);
@@ -52,6 +54,7 @@ private:
     const std::string m_ProgName;
 
     PageSize    m_PageSize;
+    Margins     m_PageMargins;
     bool        m_Landscape;
     ICharPreprocessor *m_Preprocessor;
     std::string m_OutputFile;

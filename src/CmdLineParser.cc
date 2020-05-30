@@ -26,6 +26,7 @@
 
 #include "CmdLineParser.h"
 #include "PageSizeFactory.h"
+#include "MarginsFactory.h"
 #include "PreprocessorFactory.h"
 
 const struct option CmdLineParser::LONG_OPTIONS[] =
@@ -36,11 +37,12 @@ const struct option CmdLineParser::LONG_OPTIONS[] =
     {"preprocessor",required_argument,  0,  'P'},
     {"font-face",   required_argument,  0,  'f'},
     {"font-size",   required_argument,  0,  's'},
+    {"margins",     required_argument,  0,  'm'},
     {"help",        no_argument,        0,  'h'},
     { 0, 0, 0, 0 }
 };
 
-const char *CmdLineParser::SHORT_OPTIONS="p:lo:P:h";
+const char *CmdLineParser::SHORT_OPTIONS="p:lo:P:m:h";
 
 const char *CmdLineParser::DEFAULT_FONT_FACE = "Courier New";
 const double CmdLineParser::DEFAULT_FONT_SIZE = 11.0;
@@ -48,6 +50,7 @@ const double CmdLineParser::DEFAULT_FONT_SIZE = 11.0;
 CmdLineParser::CmdLineParser(int argc, char* const argv[]):
     m_ProgName((argc>0 && argv[0] != nullptr)? argv[0] : "dotprint"),
     m_PageSize(PageSizeFactory::GetDefault()),
+    m_PageMargins(MarginsFactory::GetDefault()),
     m_Landscape(false),
     m_Preprocessor(PreprocessorFactory::GetDefault()),
     m_OutputFileSet(false),
@@ -95,6 +98,11 @@ CmdLineParser::CmdLineParser(int argc, char* const argv[]):
             SetFontSize(optarg);
             break;
 
+        case 'm':
+            // Set page margins
+            SetPageMargins(optarg);
+            break;
+
         case 'h':
             // help
             PrintHelp();
@@ -134,6 +142,11 @@ CmdLineParser::CmdLineParser(int argc, char* const argv[]):
 const PageSize &CmdLineParser::GetPageSize() const
 {
     return m_PageSize;
+}
+
+const Margins &CmdLineParser::GetPageMargins() const
+{
+    return m_PageMargins;
 }
 
 bool CmdLineParser::GetLandscape() const
@@ -186,6 +199,53 @@ void CmdLineParser::SetPageSize(const char *arg)
     m_PageSize = *p;
 }
 
+void CmdLineParser::SetPageMargins(const char *arg)
+{
+    double mtop, mright, mbottom, mleft;
+
+    if (!strcmp(arg, "formats"))
+    {
+        std::cout << m_ProgName << ": supported margin formats:" << std::endl << std::endl;
+        std::cout << "number:               one value for all margins." << std::endl;
+        std::cout << "num1,num2:            top & bottom, then left & right." << std::endl;
+        std::cout << "num1,num2,num3:       top, then left & right, then bottom." << std::endl;
+        std::cout << "num1,num2,num3,num4:  top, then right, then bottom, then left." << std::endl;
+        exit(0);
+    }
+
+    switch (sscanf(arg, "%lf,%lf,%lf,%lf", &mtop, &mright, &mbottom, &mleft))
+    {
+        case 1:
+            m_PageMargins.m_Top = mtop * milimeter;
+            m_PageMargins.m_Right = mtop * milimeter;
+            m_PageMargins.m_Bottom = mtop * milimeter;
+            m_PageMargins.m_Left = mtop * milimeter;
+            break;
+        case 2:
+            m_PageMargins.m_Top = mtop * milimeter;
+            m_PageMargins.m_Right = mright * milimeter;
+            m_PageMargins.m_Bottom = mtop * milimeter;
+            m_PageMargins.m_Left = mright * milimeter;
+            break;
+        case 3:
+            m_PageMargins.m_Top = mtop * milimeter;
+            m_PageMargins.m_Right = mright * milimeter;
+            m_PageMargins.m_Bottom = mbottom * milimeter;
+            m_PageMargins.m_Left = mright * milimeter;
+            break;
+        case 4:
+            m_PageMargins.m_Top = mtop * milimeter;
+            m_PageMargins.m_Right = mright * milimeter;
+            m_PageMargins.m_Bottom = mbottom * milimeter;
+            m_PageMargins.m_Left = mleft * milimeter;
+            break;
+        default:
+            std::cerr << m_ProgName << ": wrong margin format: " << arg << std::endl;
+            std::cerr << m_ProgName << ": Use \"--margins formats\" to get a list of valid formats." << std::endl;
+            exit(1);
+    }
+}
+
 void CmdLineParser::SetPreprocessor(const char *arg)
 {
     if (!strcmp(arg, "list"))
@@ -234,5 +294,8 @@ void CmdLineParser::PrintHelp()
     std::cout << "                      Default value: \"" << DEFAULT_FONT_FACE << "\"" << std::endl;
     std::cout << "  -s, --font-size     Font size to use." << std::endl;
     std::cout << "                      Default value: " << DEFAULT_FONT_SIZE << std::endl;
+    std::cout << "  -m, --margins       Set page margins (in millimeters)." << std::endl;
+    std::cout << "                      Use \"-m formats\" to see available formats." << std::endl;
+    std::cout << "                      Default value: " << MarginsFactory::DEFAULT_MARGIN_VALUE << " mm for all margins." << std::endl;
     std::cout << "  -h, --help          Display this help." << std::endl;
 }
