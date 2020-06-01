@@ -25,7 +25,7 @@
 class SimplePreprocessor: public ICharPreprocessor
 {
 public:
-    virtual void process(ICairoTTYProtected &ctty, unsigned char c) override;
+    virtual void process(ICairoTTYProtected &ctty, uint8_t c) override;
 };
 
 #endif // SIMPLE_PREPROCESSOR_H_

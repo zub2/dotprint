@@ -27,7 +27,7 @@ public:
     AsciiCodepageTranslator();
     virtual ~AsciiCodepageTranslator();
 
-    virtual bool translate(unsigned char in, gunichar &out);
+    virtual bool translate(uint8_t in, gunichar &out);
 
 private:
 };

@@ -29,7 +29,7 @@ EpsonPreprocessor::EpsonPreprocessor():
     m_FontSizeState(FontSizeState::FontSizeNormal)
 {}
 
-void EpsonPreprocessor::process(ICairoTTYProtected &ctty, unsigned char c)
+void EpsonPreprocessor::process(ICairoTTYProtected &ctty, uint8_t c)
 {
     if (m_InputState == InputState::Escape)
         handleEscape(ctty, c);

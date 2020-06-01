@@ -31,7 +31,7 @@ AsciiCodepageTranslator::~AsciiCodepageTranslator()
 {
 }
 
-bool AsciiCodepageTranslator::translate(unsigned char in, gunichar &out)
+bool AsciiCodepageTranslator::translate(uint8_t in, gunichar &out)
 {
     bool ret = false;
 

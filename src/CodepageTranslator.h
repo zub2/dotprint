@@ -30,10 +30,10 @@ public:
 
     void loadTable(std::string const& tableName);
 
-    virtual bool translate(unsigned char in, gunichar &out);
+    virtual bool translate(uint8_t in, gunichar &out);
 
 private:
-    typedef std::map<unsigned char, gunichar> TTransTable;
+    typedef std::map<uint8_t, gunichar> TTransTable;
 
     TTransTable m_table;
 };

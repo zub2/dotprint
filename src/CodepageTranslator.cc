@@ -67,7 +67,7 @@ void CodepageTranslator::loadTable(std::string const& tableName)
                 std::cerr << "Could not parse line. Character value to high: " << text << std::endl;
                 exit(1);
             }
-            unsigned char ch = (unsigned char) c;
+            uint8_t ch = (uint8_t) c;
             if (uni.substr(0, 2) != "U+")
             {
                 std::cerr << "Could not parse line. Unicode value not correctly formatted: " << text << std::endl;
@@ -81,7 +81,7 @@ void CodepageTranslator::loadTable(std::string const& tableName)
     }
 }
 
-bool CodepageTranslator::translate(unsigned char in, gunichar &out)
+bool CodepageTranslator::translate(uint8_t in, gunichar &out)
 {
     bool ret = false;
     auto search = m_table.find(in);

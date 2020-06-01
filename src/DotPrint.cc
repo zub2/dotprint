@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     char c;
     while (!f.get(c).eof())
     {
-        unsigned char uc = (unsigned char) c;
+        uint8_t uc = (uint8_t) c;
         ctty << uc;
     }
 

@@ -22,7 +22,7 @@
 #include <glibmm.h>
 #include "SimplePreprocessor.h"
 
-void SimplePreprocessor::process(ICairoTTYProtected &ctty, unsigned char c)
+void SimplePreprocessor::process(ICairoTTYProtected &ctty, uint8_t c)
 {
     if (iscntrl(c))
     {

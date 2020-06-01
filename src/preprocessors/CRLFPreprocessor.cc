@@ -22,7 +22,7 @@
 #include <glibmm.h>
 #include "CRLFPreprocessor.h"
 
-void CRLFPreprocessor::process(ICairoTTYProtected &ctty, unsigned char c)
+void CRLFPreprocessor::process(ICairoTTYProtected &ctty, uint8_t c)
 {
     if (iscntrl(c))
     {
