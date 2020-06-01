@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2012, 2014, 2020 David Kozub <zub at linux.fjfi.cvut.cz>
+ * Copyright (C) 2009, 2012, 2014, 2020 Felipe BF <smprg.6502 at gmail.com>
  *
  * This file is part of dotprint.
  *
