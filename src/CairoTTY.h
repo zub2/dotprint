@@ -20,6 +20,7 @@
 #ifndef CAIROTTY_H_
 #define CAIROTTY_H_
 
+#include <cstdint>
 #include <string>
 #include <algorithm>
 #include <glibmm.h>
@@ -100,9 +101,9 @@ public:
     virtual void SetFontWeight(const FontWeight weight) = 0;
     virtual void SetFontSlant(const FontSlant slant) = 0;
     virtual void StretchFont(double stretch_x, double stretch_y = 1.0) = 0;
-
     virtual void UseCurrentFont() = 0;
 
+    virtual void append(char c) = 0;
     virtual void append(gunichar c) = 0;
 
     virtual ~ICairoTTYProtected()
@@ -112,21 +113,29 @@ public:
 class ICharPreprocessor
 {
 public:
-    virtual void process(ICairoTTYProtected &ctty, gunichar c) = 0;
+    virtual void process(ICairoTTYProtected &ctty, uint8_t c) = 0;
 
     virtual ~ICharPreprocessor()
+    {}
+};
+
+class ICodepageTranslator
+{
+public:
+    virtual bool translate(uint8_t in, gunichar &out) = 0;
+
+    virtual ~ICodepageTranslator()
     {}
 };
 
 class CairoTTY: protected ICairoTTYProtected
 {
 public:
-    CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor);
+    CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor, ICodepageTranslator *translator);
 
     virtual ~CairoTTY();
 
-    CairoTTY &operator<<(const Glib::ustring &s);
-    CairoTTY &operator<<(gunichar c);
+    CairoTTY &operator<<(uint8_t c);
 
     void SetPreprocessor(ICharPreprocessor *preprocessor);
 
@@ -147,6 +156,7 @@ public:
     virtual void StretchFont(double stretch_x, double stretch_y = 1.0);
 
 protected:
+    virtual void append(char c);
     virtual void append(gunichar c);
 
 private:
@@ -169,6 +179,7 @@ private:
     double m_StretchY;
 
     ICharPreprocessor *m_Preprocessor;
+    ICodepageTranslator *m_CpTranslator;
 
     void SetFont(const std::string &family, double size,
         Cairo::FontSlant slant = Cairo::FONT_SLANT_NORMAL,

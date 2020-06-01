@@ -28,6 +28,7 @@
 #include "PageSizeFactory.h"
 #include "MarginsFactory.h"
 #include "PreprocessorFactory.h"
+#include "CodepageTranslator.h"
 
 const struct option CmdLineParser::LONG_OPTIONS[] =
 {
@@ -35,6 +36,7 @@ const struct option CmdLineParser::LONG_OPTIONS[] =
     {"landscape",   no_argument,        0,  'l'},
     {"output",      required_argument,  0,  'o'},
     {"preprocessor",required_argument,  0,  'P'},
+    {"translator",  required_argument,  0,  't'},
     {"font-face",   required_argument,  0,  'f'},
     {"font-size",   required_argument,  0,  's'},
     {"margins",     required_argument,  0,  'm'},
@@ -42,7 +44,7 @@ const struct option CmdLineParser::LONG_OPTIONS[] =
     { 0, 0, 0, 0 }
 };
 
-const char *CmdLineParser::SHORT_OPTIONS="p:lo:P:m:h";
+const char *CmdLineParser::SHORT_OPTIONS="p:lo:P:t:m:h";
 
 const char *CmdLineParser::DEFAULT_FONT_FACE = "Courier New";
 const double CmdLineParser::DEFAULT_FONT_SIZE = 11.0;
@@ -53,6 +55,7 @@ CmdLineParser::CmdLineParser(int argc, char* const argv[]):
     m_PageMargins(MarginsFactory::GetDefault()),
     m_Landscape(false),
     m_Preprocessor(PreprocessorFactory::GetDefault()),
+    m_Translator(nullptr),
     m_OutputFileSet(false),
     m_FontFace(DEFAULT_FONT_FACE),
     m_FontSize(DEFAULT_FONT_SIZE)
@@ -86,6 +89,11 @@ CmdLineParser::CmdLineParser(int argc, char* const argv[]):
         case 'P':
             // Set preprocessor
             SetPreprocessor(optarg);
+            break;
+
+        case 't':
+            // Set codepage translator
+            SetTranslator(optarg);
             break;
 
         case 'f':
@@ -157,6 +165,11 @@ bool CmdLineParser::GetLandscape() const
 ICharPreprocessor *CmdLineParser::GetPreprocessor() const
 {
     return m_Preprocessor;
+}
+
+ICodepageTranslator *CmdLineParser::GetCodepageTranslator() const
+{
+    return m_Translator;
 }
 
 const std::string &CmdLineParser::GetOutputFile() const
@@ -266,6 +279,15 @@ void CmdLineParser::SetPreprocessor(const char *arg)
     m_Preprocessor = p;
 }
 
+void CmdLineParser::SetTranslator(const char *arg)
+{
+    CodepageTranslator *t = new CodepageTranslator();
+
+    t->loadTable(arg);
+
+    m_Translator = t;
+}
+
 void CmdLineParser::SetFontFace(const char *arg)
 {
     m_FontFace = arg;
@@ -290,6 +312,7 @@ void CmdLineParser::PrintHelp()
     std::cout << "  -l, --landscape     Set landscape mode." << std::endl;
     std::cout << "  -P, --preprocessor  Select preprocessor to use." << std::endl;
     std::cout << "                      Use \"-P list\" to see available values." << std::endl;
+    std::cout << "  -t, --translator    Select codepage translator to use." << std::endl;
     std::cout << "  -f, --font-face     Font to use." << std::endl;
     std::cout << "                      Default value: \"" << DEFAULT_FONT_FACE << "\"" << std::endl;
     std::cout << "  -s, --font-size     Font size to use." << std::endl;

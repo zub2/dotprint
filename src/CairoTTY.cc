@@ -20,15 +20,18 @@
 #include <iostream>
 #include <assert.h>
 #include "CairoTTY.h"
+#include "AsciiCodepageTranslator.h"
+#include "CodepageTranslator.h"
 
-CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor):
+CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor, ICodepageTranslator *translator):
     m_CairoSurface(cs),
     m_FontName("Courier New"),
     m_FontSize(10.0),
     m_FontWeight(FontWeight::Normal),
     m_FontSlant(FontSlant::Normal),
     m_Margins(m),
-    m_Preprocessor(preprocessor)
+    m_Preprocessor(preprocessor),
+    m_CpTranslator(translator)
 {
     m_Context = Cairo::Context::create(m_CairoSurface);
 
@@ -46,20 +49,12 @@ CairoTTY::~CairoTTY()
     m_CairoSurface->finish();
 }
 
-CairoTTY &CairoTTY::operator<<(const Glib::ustring &s)
-{
-    for (gunichar c : s)
-        operator<<(c);
-
-    return *this;
-}
-
-CairoTTY &CairoTTY::operator<<(gunichar c)
+CairoTTY &CairoTTY::operator<<(unsigned char c)
 {
     if (m_Preprocessor)
         m_Preprocessor->process(*this, c);
     else
-        append(c);
+        append((char) c);
 
     return *this;
 }
@@ -174,10 +169,33 @@ void CairoTTY::StretchFont(double stretch_x, double stretch_y)
     m_StretchY = stretch_y;
 }
 
+void CairoTTY::append(char c)
+{
+    gunichar uc;
+
+    if (m_CpTranslator == nullptr)
+    {
+        m_CpTranslator = new AsciiCodepageTranslator();
+    }
+
+    if (m_CpTranslator->translate(c, uc))
+    {
+        append(uc);
+    }
+}
+
 void CairoTTY::append(gunichar c)
 {
-    assert(!Glib::Unicode::iscntrl(c));
-
+    if (c == 0x09)
+    {
+        // TODO: tab handling
+        return;
+    }
+    else if (Glib::Unicode::iscntrl(c))
+    {
+        std::cout << "Cannot print character 0x" << std::hex << c << std::endl;
+        return;
+    }
     Glib::ustring s(1, c);
 
     Cairo::TextExtents t;
@@ -197,3 +215,4 @@ void CairoTTY::append(gunichar c)
     // vertical text layout.
     m_x += x_advance;
 }
+

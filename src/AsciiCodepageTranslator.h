@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2012, 2014 David Kozub <zub at linux.fjfi.cvut.cz>
+ * Copyright (C) 2020 Peter Kessen <p.kessen at kessen-peter.de>
  *
  * This file is part of dotprint.
  *
@@ -17,15 +17,14 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SIMPLE_PREPROCESSOR_H_
-#define SIMPLE_PREPROCESSOR_H_
+#include <sstream>
+#include <string>
+#include "CairoTTY.h"
 
-#include "../CairoTTY.h"
-
-class SimplePreprocessor: public ICharPreprocessor
+class AsciiCodepageTranslator : public ICodepageTranslator
 {
 public:
-    virtual void process(ICairoTTYProtected &ctty, uint8_t c) override;
+    virtual bool translate(uint8_t in, gunichar &out);
+private:
 };
 
-#endif // SIMPLE_PREPROCESSOR_H_

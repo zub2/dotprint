@@ -18,12 +18,13 @@
  */
 
 #include <iostream>
+#include <iomanip>
 #include <glibmm.h>
 #include "CRLFPreprocessor.h"
 
-void CRLFPreprocessor::process(ICairoTTYProtected &ctty, gunichar c)
+void CRLFPreprocessor::process(ICairoTTYProtected &ctty, uint8_t c)
 {
-    if (Glib::Unicode::iscntrl(c))
+    if (iscntrl(c))
     {
         // Control codes handled here
         switch (c)
@@ -41,10 +42,13 @@ void CRLFPreprocessor::process(ICairoTTYProtected &ctty, gunichar c)
             break;
 
         default:
-            std::cerr << "CRLFPreprocessor::process(): ignoring unknown character 0x" << std::hex << c << std::endl;
-            //assert(0);
+            {
+                int i = c;
+                std::cerr << "CRLFPreprocessor::process(): ignoring unknown character 0x"
+                    << std::setfill('0') << std::setw(2) << std::hex << i << std::endl;
+            }
         }
     }
     else
-        ctty.append(c);
+        ctty.append((char) c);
 }

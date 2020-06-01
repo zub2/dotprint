@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <iomanip>
 #include <glibmm.h>
 #include "EpsonPreprocessor.h"
 
@@ -28,11 +29,11 @@ EpsonPreprocessor::EpsonPreprocessor():
     m_FontSizeState(FontSizeState::FontSizeNormal)
 {}
 
-void EpsonPreprocessor::process(ICairoTTYProtected &ctty, gunichar c)
+void EpsonPreprocessor::process(ICairoTTYProtected &ctty, uint8_t c)
 {
     if (m_InputState == InputState::Escape)
         handleEscape(ctty, c);
-    else if (Glib::Unicode::iscntrl(c))
+    else
     {
         // Control codes handled here
         switch (c)
@@ -79,18 +80,14 @@ void EpsonPreprocessor::process(ICairoTTYProtected &ctty, gunichar c)
             m_EscapeState = EscapeState::Entered;
             break;
 
-        //default:
-            // Do what an epson printer does: Silently ignore the char (?)
-            // if (verbose)
-            //std::cerr << "EpsonPreprocessor::process(): ignoring unknown character 0x" << std::hex << c << std::endl;
-            //assert(0);
+        default:
+            ctty.append((char) c);
+            break;
         }
     }
-    else
-        ctty.append(c);
 }
 
-void EpsonPreprocessor::handleEscape(ICairoTTYProtected &ctty, gunichar c)
+void EpsonPreprocessor::handleEscape(ICairoTTYProtected &ctty, char c)
 {
     // Determine what escape code follows
     if (m_EscapeState == EscapeState::Entered)
@@ -114,7 +111,12 @@ void EpsonPreprocessor::handleEscape(ICairoTTYProtected &ctty, gunichar c)
             break;
 
         default:
-            std::cerr << "EpsonPreprocessor::handleEscape(): ignoring unknown escape ESC 0x" << std::hex << c << std::endl;
+            {
+                int i = c;
+                std::cerr << "EpsonPreprocessor::handleEscape(): ignoring unknown escape ESC 0x"
+                    << std::setfill('0') << std::setw(2) << std::hex << i << std::endl;
+                m_InputState = InputState::InputNormal; // Leave escape state
+            }
         }
 
         /*

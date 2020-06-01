@@ -18,67 +18,16 @@
  */
 
 #include <iostream>
+#include <fstream>
 #include <stdexcept>
 
 #include <assert.h>
 
-#include <unistd.h>
 #include <getopt.h>
 
 #include "CairoTTY.h"
 #include "PageSizeFactory.h"
 #include "CmdLineParser.h"
-
-class UniFileStream
-{
-public:
-    UniFileStream(const std::string &fname):
-        m_io(nullptr),
-        m_eof(false)
-    {
-        GError *err = nullptr;
-
-        m_io = g_io_channel_new_file(fname.c_str(), "r", &err);
-        if (!m_io)
-        {
-            assert(err != nullptr);
-
-            throw std::runtime_error(std::string("Cannot open input file: ") + err->message);
-        }
-    }
-
-    bool ReadUniChar(gunichar &c)
-    {
-        assert(m_io != nullptr);
-        GIOStatus status = g_io_channel_read_unichar(m_io, &c, nullptr);
-
-        if (status == G_IO_STATUS_NORMAL)
-            return true;
-
-        if (status == G_IO_STATUS_EOF)
-            m_eof = true;
-        else
-            throw std::runtime_error("can't read fron input file!");
-
-        c = 0;
-        return false;
-    }
-
-    bool Eof() const
-    {
-        return m_eof;
-    }
-
-    ~UniFileStream()
-    {
-        assert(m_io != nullptr);
-        g_io_channel_shutdown (m_io, TRUE, nullptr);
-    }
-
-protected:
-    GIOChannel *m_io;
-    bool m_eof;
-};
 
 int main(int argc, char *argv[])
 {
@@ -89,25 +38,30 @@ int main(int argc, char *argv[])
         p.Landscape();
 
     ICharPreprocessor *preproc = cmdline.GetPreprocessor();
+    ICodepageTranslator *translator = cmdline.GetCodepageTranslator();
 
     Cairo::RefPtr<Cairo::PdfSurface> cs = Cairo::PdfSurface::create(cmdline.GetOutputFile(), p.m_Width, p.m_Height);
     assert(cs);
 
     Margins m = cmdline.GetPageMargins();
 
-    CairoTTY ctty(cs, p, m, preproc);
+    CairoTTY ctty(cs, p, m, preproc, translator);
 
     // Set the font
     ctty.SetFontName(cmdline.GetFontFace());
     ctty.SetFontSize(cmdline.GetFontSize());
     ctty.UseCurrentFont();
 
-    UniFileStream f(cmdline.GetInputFile());
-
-    gunichar c;
-    while (f.ReadUniChar(c))
+    std::fstream f(cmdline.GetInputFile(), std::fstream::in | std::fstream::binary);
+    if (!f.is_open())
     {
-        ctty << c;
+        throw std::ios_base::failure("Unable to open file \"" + cmdline.GetInputFile() + "\"");
+    }
+    char c;
+    while (!f.get(c).eof())
+    {
+        uint8_t uc = (uint8_t) c;
+        ctty << uc;
     }
 
     return 0;
