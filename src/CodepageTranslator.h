@@ -25,9 +25,6 @@
 class CodepageTranslator : public ICodepageTranslator
 {
 public:
-    CodepageTranslator();
-    virtual ~CodepageTranslator();
-
     void loadTable(std::string const& tableName);
 
     virtual bool translate(uint8_t in, gunichar &out);

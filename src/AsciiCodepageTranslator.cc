@@ -23,14 +23,6 @@
 #include <sstream>
 #include <iomanip>
 
-AsciiCodepageTranslator::AsciiCodepageTranslator()
-{
-}
-
-AsciiCodepageTranslator::~AsciiCodepageTranslator()
-{
-}
-
 bool AsciiCodepageTranslator::translate(uint8_t in, gunichar &out)
 {
     bool ret = false;

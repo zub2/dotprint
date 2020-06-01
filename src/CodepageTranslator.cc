@@ -23,14 +23,6 @@
 #include <sstream>
 #include <iomanip>
 
-CodepageTranslator::CodepageTranslator()
-{
-}
-
-CodepageTranslator::~CodepageTranslator()
-{
-}
-
 void CodepageTranslator::loadTable(std::string const& tableName)
 {
     std::fstream f(tableName, std::fstream::in);

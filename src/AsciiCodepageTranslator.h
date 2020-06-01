@@ -24,11 +24,7 @@
 class AsciiCodepageTranslator : public ICodepageTranslator
 {
 public:
-    AsciiCodepageTranslator();
-    virtual ~AsciiCodepageTranslator();
-
     virtual bool translate(uint8_t in, gunichar &out);
-
 private:
 };
 
