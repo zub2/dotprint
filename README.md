@@ -7,7 +7,15 @@ If you want to use such files now, converting them into PDF is quite useful. You
 
 So this might be useful to you if you are still running some DOS applications, perhaps in dosemu. With some scripting you can make the old DOS applications produce PDFs.
 
-The is one caveat though: dotprint expectes the input to be in UTF-8 encoding, which is something a DOS application would most likely *not* produce. So you must convert the input from whatever encoding your application uses (probably something like CP850, CP852, CP895, ...) into UTF-8. There are many programs that can do that. But most of them corrupt the escape sequences (which include control characters, e.g. 0x1b). So pick a tool that doesn't. I recommend cp2utf8. :-)
+In difference to previous versions: dotprint does not expect the input to be in UTF-8 encoding, which is something a DOS application would most likely *not* produce.
+So no conversion of the input file is necessary.
+You can define your encoding by a commandline switch.
+Assuming your Input file is in CP850 you can specify the encoding with a translation table:
+```
+dotprint -t tables/cp850.trans --output myfile.pdf myfile.PRN
+```
+Those translation files are delivered with dotprint in the tables folder.
+TODO: Specifiy an installation directory for the translation tables and reference this folder here.
 
 # Compiling
 
