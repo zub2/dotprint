@@ -44,7 +44,7 @@ const struct option CmdLineParser::LONG_OPTIONS[] =
     { 0, 0, 0, 0 }
 };
 
-const char *CmdLineParser::SHORT_OPTIONS="p:lo:P:t:m:h";
+const char *CmdLineParser::SHORT_OPTIONS="p:lo:P:t:f:s:m:h";
 
 const char *CmdLineParser::DEFAULT_FONT_FACE = "Courier New";
 const double CmdLineParser::DEFAULT_FONT_SIZE = 11.0;
