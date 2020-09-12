@@ -1,4 +1,3 @@
 #!/bin/sh
 CONTAINER_NAME=dotprint
-workdir=`pwd`
-docker run --rm -v "${workdir}":/work ${CONTAINER_NAME} $*
+docker run --rm -v "$(pwd)":/work ${CONTAINER_NAME} $*

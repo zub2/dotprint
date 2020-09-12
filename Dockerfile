@@ -1,7 +1,6 @@
-FROM alpine:latest as stage
+FROM alpine:3.11 as stage
 
-RUN apk update && \
-    apk add glibmm-dev cairomm-dev gcc g++ cmake make
+RUN apk --no-cache add glibmm-dev cairomm-dev gcc g++ cmake make
 
 COPY . /build
 
@@ -9,11 +8,10 @@ WORKDIR /build
 
 RUN cmake . && make
 
-FROM alpine:latest
+FROM alpine:3.11
 LABEL MAINTAINER="github/@rusq"
 
-RUN apk update
-RUN apk add libstdc++ cairomm glibmm msttcorefonts-installer
+RUN apk --no-cache add libstdc++ cairomm glibmm msttcorefonts-installer
 
 RUN update-ms-fonts && fc-cache -f
 
