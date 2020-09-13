@@ -43,7 +43,7 @@ You can specify your own `DESTDIR`.
 
 # Usage
 
-You need to specifiy:
+You need to specify:
 
 * the input file (text input with potential escape sequences, in UTF-8 encoding)
 * the output file (PDF)
@@ -53,6 +53,37 @@ You most likely want to specify the preprocessor. By default only newlines are i
     dotprint input-file.txt -o output-file.pdf -P epson
 
 Run `dotprint -h` for a list of all the options.
+
+# Building Docker Container
+
+This might be useful if you're using macOS and don't have development tools or
+C++ compiler, but have Docker.
+
+To build the docker container, run:
+
+    ./build-docker.sh
+
+This will build `dotprint:latest` image based on `alpine:latest` with some
+preinstalled font (including the Courier New, which is used by default).
+
+# Running in Docker
+
+
+
+The easy way to run conversion is:
+
+    ./convert.sh input.prn -o output.pdf
+
+Docker container has `dotprint` as an entry point and any options specified on
+the command line are the commands are passed to the dotprint executable.
+
+If you need to run this manually, you'd need to volume-mount the current
+directory to `/work` directory of the container, i.e.:
+
+    docker run --rm -v `pwd`:/work dotprint \
+        -P epson \
+        tests/test4.ASCII.prn \
+        -o output.pdf
 
 # Licence
 
