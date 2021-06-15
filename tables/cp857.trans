@@ -1,6 +1,10 @@
 # CP857 (Turkish) to Unicode
 # Reference: https://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/PC/CP857.TXT
 #
+# Known issues: 
+# - 0xf2 and 0xe7 is undefined in CP857 but here CP850 mapping is used. 
+# - 0xd5 is undefined in Unicode reference link, for this CP850 mapping is used.
+#
 # Its licence is:
 # All files in this package may be freely copied under the terms
 # of the GNU General Public License (GPL), version 2, or at your
