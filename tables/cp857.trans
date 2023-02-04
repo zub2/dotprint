@@ -1,9 +1,10 @@
 # CP857 (Turkish) to Unicode
 # Reference: https://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/PC/CP857.TXT
 #
-# Known issues: 
+# Known differences: 
 # - 0xf2 and 0xe7 is undefined in CP857 but here CP850 mapping is used. 
-# - 0xd5 is undefined in Unicode reference link, for this CP850 mapping is used.
+# - 0xd5 is undefined in Unicode reference link, Euro Sign (U+20AC) is used
+#   based on Wikipedia information.
 #
 # Its licence is:
 # All files in this package may be freely copied under the terms
@@ -223,7 +224,7 @@
 0xd2	U+00ca	# LATIN CAPITAL LETTER E WITH CIRCUMFLEX
 0xd3	U+00cb	# LATIN CAPITAL LETTER E WITH DIAERESIS
 0xd4	U+00c8	# LATIN CAPITAL LETTER E WITH GRAVE
-0xd5	U+0131	# LATIN SMALL LETTER DOTLESS I
+0xd5	U+20AC	# EURO SIGN
 0xd6	U+00cd	# LATIN CAPITAL LETTER I WITH ACUTE
 0xd7	U+00ce	# LATIN CAPITAL LETTER I WITH CIRCUMFLEX
 0xd8	U+00cf	# LATIN CAPITAL LETTER I WITH DIAERESIS
