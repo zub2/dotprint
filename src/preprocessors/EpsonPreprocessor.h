@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2012, 2014 David Kozub <zub at linux.fjfi.cvut.cz>
+ * Copyright (C) 2009, 2012, 2014, 2023 David Kozub <zub at linux.fjfi.cvut.cz>
  *
  * This file is part of dotprint.
  *
@@ -59,13 +59,14 @@ private:
     InputState m_InputState;
     EscapeState m_EscapeState;
     FontSizeState m_FontSizeState;
-    bool m_Escape;
+    //bool m_Escape;
     int m_GraphicAssembledBytes;
     uint8_t m_GraphicsMode; // Graphics mode
-    int m_GraphicsDpi; // Dots per inch
-    int m_GraphicsDpc; // Dots per column
+    //int m_GraphicsDpi; // Dots per inch
+    //int m_GraphicsDpc; // Dots per column
     int m_GraphicsNrColumns; // Number of columns
     int m_GraphicsMaxBytes; // Number of columns
+    int m_GraphicsCol;
 };
 
 #endif // EPSON_PREPROCESSOR_H_

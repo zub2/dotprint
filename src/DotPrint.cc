@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2012, 2014 David Kozub <zub at linux.fjfi.cvut.cz>
+ * Copyright (C) 2009, 2012, 2014, 2023 David Kozub <zub at linux.fjfi.cvut.cz>
  *
  * This file is part of dotprint.
  *
@@ -57,11 +57,11 @@ int main(int argc, char *argv[])
     {
         throw std::ios_base::failure("Unable to open file \"" + cmdline.GetInputFile() + "\"");
     }
+
     char c;
     while (!f.get(c).eof())
     {
-        uint8_t uc = (uint8_t) c;
-        ctty << uc;
+        ctty << static_cast<uint8_t>(c);
     }
 
     return 0;

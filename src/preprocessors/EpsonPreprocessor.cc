@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2012, 2014 David Kozub <zub at linux.fjfi.cvut.cz>
+ * Copyright (C) 2009, 2012, 2014, 2023 David Kozub <zub at linux.fjfi.cvut.cz>
  *
  * This file is part of dotprint.
  *
@@ -20,6 +20,8 @@
 #include <stdexcept>
 #include <iostream>
 #include <iomanip>
+#include <type_traits>
+
 #include <glibmm.h>
 #include "EpsonPreprocessor.h"
 
@@ -198,28 +200,25 @@ void EpsonPreprocessor::handleEscape(ICairoTTYProtected &ctty, uint8_t c)
 
     default:
         throw std::runtime_error("EpsonPreprocessor::handleEscape(): Internal error: entered unknown escape state "
-            + std::to_string(static_cast<int>(m_EscapeState)));
+            + std::to_string(static_cast<std::underlying_type_t<decltype(m_EscapeState)>>(m_EscapeState)));
     }
 }
 
-void EpsonPreprocessor::handleGraphics(ICairoTTYProtected &ctty, uint8_t c)
+void EpsonPreprocessor::handleGraphics(ICairoTTYProtected & /*ctty*/, uint8_t c)
 {
-    static int col;
-
-    if (0 == m_GraphicAssembledBytes)
+    if (m_GraphicAssembledBytes == 0)
     {
         m_GraphicsMode = c;
         m_GraphicAssembledBytes = 1;
     }
     else if (m_GraphicAssembledBytes == 1)
     {
-        m_GraphicsNrColumns = (unsigned char) c;
+        m_GraphicsNrColumns = c;
         m_GraphicAssembledBytes = 2;
     }
     else if (m_GraphicAssembledBytes == 2)
     {
-        int nh = (unsigned char) c;
-        m_GraphicsNrColumns += nh * 256;
+        m_GraphicsNrColumns += c * 256;
         m_GraphicAssembledBytes = 3;
     }
     else
@@ -230,10 +229,10 @@ void EpsonPreprocessor::handleGraphics(ICairoTTYProtected &ctty, uint8_t c)
         }
 
         int rowGroup = m_GraphicAssembledBytes % 3;
-        col |= ((unsigned int) c) << (8 * (2 - rowGroup));
-        if (2 == rowGroup)
+        m_GraphicsCol |= ((unsigned int) c) << (8 * (2 - rowGroup));
+        if (rowGroup == 2)
         {
-            col = 0;
+            m_GraphicsCol = 0;
         }
 
         ++m_GraphicAssembledBytes;
