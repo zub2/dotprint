@@ -1,11 +1,11 @@
 # CP857 (Turkish) to Unicode
 #
-# Known differences: 
-# - 0xf2 and 0xe7 is undefined in CP857 but here CP850 mapping is used. 
+# Known differences:
+# - 0xf2 and 0xe7 is undefined in CP857 but here CP850 mapping is used.
 # - 0xd5 is undefined in Unicode reference link, Euro Sign (U+20AC) is used
 #   based on Wikipedia information.
 #
-# References: 
+# References:
 # - https://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/PC/CP857.TXT
 # - https://en.wikipedia.org/wiki/Code_page_857
 # - https://public.dhe.ibm.com/software/globalization/gcoc/attachments/CP00857.txt
