@@ -33,29 +33,32 @@ int main(int argc, char *argv[])
 {
     CmdLineParser cmdline(argc, argv);
 
-    PageSize p = cmdline.GetPageSize();
-    if (cmdline.GetLandscape())
-        p.Landscape();
+    PageSize p = cmdline.getPageSize();
+    if (cmdline.isLandscape())
+        p.rotate();
 
-    ICharPreprocessor *preproc = cmdline.GetPreprocessor();
-    ICodepageTranslator *translator = cmdline.GetCodepageTranslator();
+    ICharPreprocessor *preproc = cmdline.getPreprocessor();
+    ICodepageTranslator *translator = cmdline.getCodepageTranslator();
 
-    Cairo::RefPtr<Cairo::PdfSurface> cs = Cairo::PdfSurface::create(cmdline.GetOutputFile(), p.m_Width, p.m_Height);
-    assert(cs);
+    Cairo::RefPtr<Cairo::PdfSurface> cs = Cairo::PdfSurface::create(cmdline.getOutputFile(), p.width, p.height);
+    if (!cs)
+    {
+        throw std::runtime_error("Can't create cairo PdfSurface");
+    }
 
-    Margins m = cmdline.GetPageMargins();
+    Margins m = cmdline.getPageMargins();
 
     CairoTTY ctty(cs, p, m, preproc, translator);
 
     // Set the font
-    ctty.SetFontName(cmdline.GetFontFace());
-    ctty.SetFontSize(cmdline.GetFontSize());
-    ctty.UseCurrentFont();
+    ctty.setFontName(cmdline.getFontFace());
+    ctty.setFontSize(cmdline.getFontSize());
+    ctty.useCurrentFont();
 
-    std::fstream f(cmdline.GetInputFile(), std::fstream::in | std::fstream::binary);
+    std::fstream f(cmdline.getInputFile(), std::fstream::in | std::fstream::binary);
     if (!f.is_open())
     {
-        throw std::ios_base::failure("Unable to open file \"" + cmdline.GetInputFile() + "\"");
+        throw std::ios_base::failure("Unable to open file \"" + cmdline.getInputFile() + "\"");
     }
 
     char c;

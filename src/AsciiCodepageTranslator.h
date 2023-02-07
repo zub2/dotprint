@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Peter Kessen <p.kessen at kessen-peter.de>
+ * Copyright (C) 2023 David Kozub <zub at linux.fjfi.cvut.cz>
  *
  * This file is part of dotprint.
  *
@@ -17,14 +18,16 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <sstream>
-#include <string>
+#ifndef ASCII_CODEPAGE_TRANSLATOR_H_
+#define ASCII_CODEPAGE_TRANSLATOR_H_
+
+#include <cstdint>
 #include "CairoTTY.h"
 
 class AsciiCodepageTranslator : public ICodepageTranslator
 {
 public:
-    virtual bool translate(uint8_t in, gunichar &out);
-private:
+    virtual bool translate(uint8_t in, gunichar &out) override;
 };
 
+#endif // ASCII_CODEPAGE_TRANSLATOR_H_

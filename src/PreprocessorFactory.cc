@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2012, 2014 David Kozub <zub at linux.fjfi.cvut.cz>
+ * Copyright (C) 2009, 2012, 2014, 2023 David Kozub <zub at linux.fjfi.cvut.cz>
  *
  * This file is part of dotprint.
  *
@@ -30,34 +30,34 @@ namespace
     CRLFPreprocessor CRLF;
     EpsonPreprocessor Epson;
 
-    const std::map<std::string, ICharPreprocessor*> Preprocessors =
+    const std::map<std::string, ICharPreprocessor*> PREPROCESSORS =
     {
         { "simple", &Simple },
         { "crlf", &CRLF },
         { "epson", &Epson }
     };
 
-    ICharPreprocessor* DefaultPreprocessor = &Simple;
+    ICharPreprocessor* DEFAULT_PREPROCESSOR = &Simple;
 }
 
-void PreprocessorFactory::Print(std::ostream &s)
+void PreprocessorFactory::print(std::ostream &s)
 {
-    for (const auto& preprocessor: Preprocessors)
+    for (const auto& preprocessor: PREPROCESSORS)
     {
         s << preprocessor.first;
-        if (preprocessor.second == DefaultPreprocessor)
+        if (preprocessor.second == DEFAULT_PREPROCESSOR)
             s << " [default]";
-        s << std::endl;
+        s << '\n';
     }
 }
 
-ICharPreprocessor* PreprocessorFactory::Lookup(const std::string& name)
+ICharPreprocessor* PreprocessorFactory::lookup(const std::string& name)
 {
-    auto it = Preprocessors.find(name);
-    return it != Preprocessors.end() ? it->second : nullptr;
+    const auto it = PREPROCESSORS.find(name);
+    return it != PREPROCESSORS.end() ? it->second : nullptr;
 }
 
-ICharPreprocessor* PreprocessorFactory::GetDefault()
+ICharPreprocessor* PreprocessorFactory::getDefault()
 {
-    return Preprocessors.begin()->second;
+    return PREPROCESSORS.begin()->second;
 }

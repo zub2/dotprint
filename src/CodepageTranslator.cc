@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Peter Kessen <p.kessen at kessen-peter.de>
+ * Copyright (C) 2023 David Kozub <zub at linux.fjfi.cvut.cz>
  *
  * This file is part of dotprint.
  *
@@ -18,17 +19,15 @@
  */
 
 #include "CodepageTranslator.h"
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 
-void CodepageTranslator::loadTable(std::string const& tableName)
+CodepageTranslator::CodepageTranslator(const std::string &tableName)
 {
     std::fstream f(tableName, std::fstream::in);
-    std::string line;
-
-    m_table.clear();
 
     if (!f.is_open())
     {
@@ -36,6 +35,7 @@ void CodepageTranslator::loadTable(std::string const& tableName)
         exit(1);
     }
 
+    std::string line;
     while (std::getline(f, line))
     {
         auto startText = line.find_first_not_of(" \t");
@@ -75,22 +75,15 @@ void CodepageTranslator::loadTable(std::string const& tableName)
 
 bool CodepageTranslator::translate(uint8_t in, gunichar &out)
 {
-    bool ret = false;
-    auto search = m_table.find(in);
+    const auto it = m_table.find(in);
 
-    if (search != m_table.end())
+    if (it != m_table.end())
     {
-        out = search->second;
-        ret = true;
-    }
-    else
-    {
-        int i = in;
-        ret = false;
-        std::cerr << "CodepageTranslator::translate(): Droppping unknown char 0x"
-            << std::setfill('0') << std::setw(2) << std::hex << i << std::endl;
+        out = it->second;
+        return true;
     }
 
-    return ret;
+    std::cerr << "CodepageTranslator::translate(): Droppping unknown char 0x"
+        << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(in) << std::endl;
+    return false;
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2012, 2014 David Kozub <zub at linux.fjfi.cvut.cz>
+ * Copyright (C) 2009, 2012, 2014, 2023 David Kozub <zub at linux.fjfi.cvut.cz>
  *
  * This file is part of dotprint.
  *
@@ -17,168 +17,181 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-#include <assert.h>
 #include "CairoTTY.h"
+
+#include <iostream>
+#include <stdexcept>
+
 #include "AsciiCodepageTranslator.h"
 #include "CodepageTranslator.h"
 
 CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor, ICodepageTranslator *translator):
-    m_CairoSurface(cs),
-    m_FontName("Courier New"),
-    m_FontSize(10.0),
-    m_FontWeight(FontWeight::Normal),
-    m_FontSlant(FontSlant::Normal),
-    m_Margins(m),
-    m_Preprocessor(preprocessor),
-    m_CpTranslator(translator)
+    m_cairoSurface(cs),
+    m_fontName("Courier New"),
+    m_fontSize(10.0),
+    m_fontWeight(FontWeight::Normal),
+    m_fontSlant(FontSlant::Normal),
+    m_margins(m),
+    m_preprocessor(preprocessor),
+    m_cpTranslator(translator)
 {
-    m_Context = Cairo::Context::create(m_CairoSurface);
+    m_context = Cairo::Context::create(m_cairoSurface);
 
-    SetPageSize(p);
+    setPageSize(p);
 
-    StretchFont(1.0, 1.0);
-    UseCurrentFont();
+    stretchFont(1.0, 1.0);
+    useCurrentFont();
 
-    Home();
+    home();
 }
 
 CairoTTY::~CairoTTY()
 {
-    m_Context.clear();
-    m_CairoSurface->finish();
+    m_context.clear();
+    m_cairoSurface->finish();
 }
 
 CairoTTY &CairoTTY::operator<<(unsigned char c)
 {
-    if (m_Preprocessor)
-        m_Preprocessor->process(*this, c);
+    if (m_preprocessor)
+        m_preprocessor->process(*this, c);
     else
         append((char) c);
 
     return *this;
 }
 
-void CairoTTY::SetPreprocessor(ICharPreprocessor *preprocessor)
+void CairoTTY::setPreprocessor(ICharPreprocessor *preprocessor)
 {
-    m_Preprocessor = preprocessor;
+    m_preprocessor = preprocessor;
 }
 
-void CairoTTY::SetFont(const std::string &family, double size, Cairo::FontSlant slant, Cairo::FontWeight weight)
+void CairoTTY::setFont(const std::string &family, double size, Cairo::FontSlant slant, Cairo::FontWeight weight)
 {
-    assert(size > 0.0);
+    if (size < 0.0)
+    {
+        throw std::runtime_error("CairoTTY: Can't specify negative font size!");
+    }
 
-    m_Context->select_font_face(family, slant, weight);
-    m_Context->set_font_size(size);
+    m_context->select_font_face(family, slant, weight);
+    m_context->set_font_size(size);
 
-    m_Context->get_font_extents(m_FontExtents);
+    m_context->get_font_extents(m_fontExtents);
 }
 
-void CairoTTY::UseCurrentFont()
+void CairoTTY::useCurrentFont()
 {
     Cairo::FontWeight weight;
     Cairo::FontSlant slant;
 
-    switch (m_FontWeight)
+    switch (m_fontWeight)
     {
-        case FontWeight::Bold:
-            weight = Cairo::FONT_WEIGHT_BOLD;
-            break;
-        default:
-            weight = Cairo::FONT_WEIGHT_NORMAL;
-            break;
+    case FontWeight::Bold:
+        weight = Cairo::FONT_WEIGHT_BOLD;
+        break;
+    default:
+        weight = Cairo::FONT_WEIGHT_NORMAL;
+        break;
     }
 
-    switch (m_FontSlant)
+    switch (m_fontSlant)
     {
-        case FontSlant::Italic:
-            slant = Cairo::FONT_SLANT_ITALIC;
-            break;
-        default:
-            slant = Cairo::FONT_SLANT_NORMAL;
-            break;
+    case FontSlant::Italic:
+        slant = Cairo::FONT_SLANT_ITALIC;
+        break;
+    default:
+        slant = Cairo::FONT_SLANT_NORMAL;
+        break;
     }
 
-    SetFont(m_FontName, m_FontSize, slant, weight);
+    setFont(m_fontName, m_fontSize, slant, weight);
 }
 
-void CairoTTY::SetPageSize(const PageSize &p)
+void CairoTTY::setPageSize(const PageSize &p)
 {
-    assert(p.m_Width > 0.0);
-    assert(p.m_Height > 0.0);
+    if (p.width <= 0.0)
+    {
+        throw std::runtime_error("CairoTTY: page width must be positive");
+    }
+    if (p.height <= 0.0)
+    {
+        throw std::runtime_error("CairoTTY: page height must be positive");
+    }
 
-    m_PageSize = p;
-    m_CairoSurface->set_size(m_PageSize.m_Width, m_PageSize.m_Height);
+    m_pageSize = p;
+    m_cairoSurface->set_size(m_pageSize.width, m_pageSize.height);
 }
 
-void CairoTTY::Home()
-{
-    m_x = 0.0;
-    m_y = m_FontExtents.height * m_StretchY; // so that the top of the first line touches 0.0
-}
-
-void CairoTTY::NewLine()
-{
-    CarriageReturn();
-    LineFeed();
-}
-
-void CairoTTY::CarriageReturn()
+void CairoTTY::home()
 {
     m_x = 0.0;
+    m_y = m_fontExtents.height * m_stretchY; // so that the top of the first line touches 0.0
 }
 
-void CairoTTY::LineFeed()
+void CairoTTY::newLine()
 {
-    m_y += m_FontExtents.height * m_StretchY;
+    carriageReturn();
+    lineFeed();
+}
+
+void CairoTTY::carriageReturn()
+{
+    m_x = 0.0;
+}
+
+void CairoTTY::lineFeed()
+{
+    m_y += m_fontExtents.height * m_stretchY;
 
     // check if we still fit on the page
-    if (m_Margins.m_Top + m_y > m_PageSize.m_Height - m_Margins.m_Bottom)
-        NewPage(); // forced pagebreak
+    if (m_margins.top + m_y > m_pageSize.height - m_margins.bottom)
+    {
+        newPage(); // forced pagebreak
+    }
 }
 
-void CairoTTY::NewPage()
+void CairoTTY::newPage()
 {
-    m_Context->show_page();
-    Home();
+    m_context->show_page();
+    home();
 }
 
-void CairoTTY::SetFontName(const std::string family)
+void CairoTTY::setFontName(const std::string &family)
 {
-    m_FontName = family;
+    m_fontName = family;
 }
 
-void CairoTTY::SetFontSize(const double size)
+void CairoTTY::setFontSize(double size)
 {
-    m_FontSize = size;
+    m_fontSize = size;
 }
 
-void CairoTTY::SetFontWeight(const FontWeight weight)
+void CairoTTY::setFontWeight(FontWeight weight)
 {
-    m_FontWeight = weight;
+    m_fontWeight = weight;
 }
 
-void CairoTTY::SetFontSlant(const FontSlant slant)
+void CairoTTY::setFontSlant(FontSlant slant)
 {
-    m_FontSlant = slant;
+    m_fontSlant = slant;
 }
 
-void CairoTTY::StretchFont(double stretch_x, double stretch_y)
+void CairoTTY::stretchFont(double stretch_x, double stretch_y)
 {
-    m_StretchX = stretch_x;
-    m_StretchY = stretch_y;
+    m_stretchX = stretch_x;
+    m_stretchY = stretch_y;
 }
 
 void CairoTTY::append(char c)
 {
     gunichar uc;
 
-    if (m_CpTranslator == nullptr)
+    if (!m_cpTranslator)
     {
-        m_CpTranslator = new AsciiCodepageTranslator();
+        m_cpTranslator = new AsciiCodepageTranslator();
     }
 
-    if (m_CpTranslator->translate(c, uc))
+    if (m_cpTranslator->translate(c, uc))
     {
         append(uc);
     }
@@ -199,20 +212,21 @@ void CairoTTY::append(gunichar c)
     Glib::ustring s(1, c);
 
     Cairo::TextExtents t;
-    m_Context->get_text_extents(s, t);
-    double x_advance = m_StretchX * t.x_advance;
+    m_context->get_text_extents(s, t);
+    double x_advance = m_stretchX * t.x_advance;
 
-    if (m_Margins.m_Left + m_x + x_advance > m_PageSize.m_Width - m_Margins.m_Right)
-        NewLine(); // forced linebreak - text wraps to the next line
+    if (m_margins.left + m_x + x_advance > m_pageSize.width - m_margins.right)
+    {
+        newLine(); // forced linebreak - text wraps to the next line
+    }
 
-    m_Context->save();
-    m_Context->move_to(m_Margins.m_Left + m_x, m_Margins.m_Top + m_y);
-    m_Context->scale(m_StretchX, m_StretchY);
-    m_Context->show_text(s);
-    m_Context->restore();
+    m_context->save();
+    m_context->move_to(m_margins.left + m_x, m_margins.top + m_y);
+    m_context->scale(m_stretchX, m_stretchY);
+    m_context->show_text(s);
+    m_context->restore();
 
     // We ignore y_advance, as we in no way can support
     // vertical text layout.
     m_x += x_advance;
 }
-

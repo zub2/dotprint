@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2009, 2012, 2014, 2020 Felipe BF <smprg.6502 at gmail.com>
+ * Copyright (C) 2009, 2012, 2014, 2023 David Kozub <zub at linux.fjfi.cvut.cz>
+ * Copyright (C) 2020 Felipe BF <smprg.6502 at gmail.com>
  *
  * This file is part of dotprint.
  *
@@ -18,18 +19,18 @@
  */
 
 #include "MarginsFactory.h"
+
 #include "PageSizeFactory.h"
 
-const double MarginsFactory::DEFAULT_MARGIN_VALUE = 10.0;
-
-namespace {
-    const Margins DefaultPageMargins(MarginsFactory::DEFAULT_MARGIN_VALUE * milimeter,
+namespace
+{
+    constexpr Margins DEFAULT_PAGE_MARGINS(MarginsFactory::DEFAULT_MARGIN_VALUE * milimeter,
             MarginsFactory::DEFAULT_MARGIN_VALUE * milimeter,
             MarginsFactory::DEFAULT_MARGIN_VALUE * milimeter,
             MarginsFactory::DEFAULT_MARGIN_VALUE * milimeter);
 }
 
-const Margins &MarginsFactory::GetDefault()
+const Margins &MarginsFactory::getDefault()
 {
-    return DefaultPageMargins;
+    return DEFAULT_PAGE_MARGINS;
 }

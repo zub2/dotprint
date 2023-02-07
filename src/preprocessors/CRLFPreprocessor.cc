@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2012, 2014 David Kozub <zub at linux.fjfi.cvut.cz>
+ * Copyright (C) 2009, 2012, 2014, 2023 David Kozub <zub at linux.fjfi.cvut.cz>
  *
  * This file is part of dotprint.
  *
@@ -17,10 +17,12 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CRLFPreprocessor.h"
+
 #include <iostream>
 #include <iomanip>
+
 #include <glibmm.h>
-#include "CRLFPreprocessor.h"
 
 void CRLFPreprocessor::process(ICairoTTYProtected &ctty, uint8_t c)
 {
@@ -30,23 +32,20 @@ void CRLFPreprocessor::process(ICairoTTYProtected &ctty, uint8_t c)
         switch (c)
         {
         case '\r':
-            ctty.CarriageReturn();
+            ctty.carriageReturn();
             break;
 
         case '\n':
-            ctty.LineFeed();
+            ctty.lineFeed();
             break;
 
         case 0x0c:
-            ctty.NewPage();
+            ctty.newPage();
             break;
 
         default:
-            {
-                int i = c;
-                std::cerr << "CRLFPreprocessor::process(): ignoring unknown character 0x"
-                    << std::setfill('0') << std::setw(2) << std::hex << i << std::endl;
-            }
+            std::cerr << "CRLFPreprocessor::process(): ignoring unknown character 0x"
+                << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c) << std::endl;
         }
     }
     else

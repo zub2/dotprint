@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2012, 2014 David Kozub <zub at linux.fjfi.cvut.cz>
+ * Copyright (C) 2009, 2012, 2014, 2023 David Kozub <zub at linux.fjfi.cvut.cz>
  *
  * This file is part of dotprint.
  *
@@ -17,8 +17,8 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CMDLINEPARSER_H_
-#define CMDLINEPARSER_H_
+#ifndef CMD_LINE_PARSER_H_
+#define CMD_LINE_PARSER_H_
 
 #include "CairoTTY.h"
 
@@ -26,25 +26,25 @@ class CmdLineParser
 {
 public:
     CmdLineParser(int argc, char* const argv[]);
-    const PageSize &GetPageSize() const;
-    const Margins &GetPageMargins() const;
-    bool GetLandscape() const;
-    const std::string &GetOutputFile() const;
-    const std::string &GetInputFile() const;
-    ICharPreprocessor *GetPreprocessor() const;
-    ICodepageTranslator *GetCodepageTranslator() const;
-    const std::string &GetFontFace() const;
-    double GetFontSize() const;
+    const PageSize &getPageSize() const;
+    const Margins &getPageMargins() const;
+    bool isLandscape() const;
+    const std::string & getOutputFile() const;
+    const std::string & getInputFile() const;
+    ICharPreprocessor * getPreprocessor() const;
+    ICodepageTranslator * getCodepageTranslator() const;
+    const std::string & getFontFace() const;
+    double getFontSize() const;
 
 protected:
-    void SetPageSize(const char *arg);
-    void SetPageMargins(const char *arg);
-    void SetPreprocessor(const char *arg);
-    void SetTranslator(const char *arg);
-    void SetFontFace(const char *arg);
-    void SetFontSize(const char *arg);
+    void setPageSize(const char *arg);
+    void setPageMargins(const char *arg);
+    void setPreprocessor(const char *arg);
+    void setTranslator(const char *arg);
+    void setFontFace(const char *arg);
+    void setFontSize(const char *arg);
 
-    void PrintHelp();
+    void printHelp();
 
 private:
     static const struct option LONG_OPTIONS[];
@@ -53,18 +53,18 @@ private:
     static const char *DEFAULT_FONT_FACE;
     static const double DEFAULT_FONT_SIZE;
 
-    const std::string m_ProgName;
+    const std::string m_progName;
 
-    PageSize    m_PageSize;
-    Margins     m_PageMargins;
-    bool        m_Landscape;
-    ICharPreprocessor *m_Preprocessor;
-    ICodepageTranslator *m_Translator;
-    std::string m_OutputFile;
-    bool m_OutputFileSet;
-    std::string m_InputFile;
-    std::string m_FontFace;
-    double m_FontSize;
+    PageSize m_pageSize;
+    Margins m_pageMargins;
+    bool m_isLandscape;
+    ICharPreprocessor *m_preprocessor;
+    ICodepageTranslator *m_translator;
+    std::string m_outputFile;
+    bool m_outputFileSet;
+    std::string m_inputFile;
+    std::string m_fontFace;
+    double m_fontSize;
 };
 
-#endif /*CMDLINEPARSER_H_*/
+#endif // CMD_LINE_PARSER_H_

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2012, 2014 David Kozub <zub at linux.fjfi.cvut.cz>
+ * Copyright (C) 2009, 2012, 2014, 2023 David Kozub <zub at linux.fjfi.cvut.cz>
  *
  * This file is part of dotprint.
  *
@@ -17,11 +17,12 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PAGESIZEFACTORY_H_
-#define PAGESIZEFACTORY_H_
+#ifndef PAGE_SIZE_FACTORY_H_
+#define PAGE_SIZE_FACTORY_H_
 
 #include <iostream>
 #include <string>
+
 #include "CairoTTY.h"
 
 /*
@@ -39,11 +40,11 @@ constexpr double milimeter = 72.0/25.4;
 class PageSizeFactory
 {
 public:
-    static void Print(std::ostream &s);
-    static const PageSize *Lookup(const std::string & name);
-    static const PageSize &GetDefault();
+    static void print(std::ostream &s);
+    static const PageSize *lookup(const std::string &name);
+    static const PageSize &getDefault();
 
     PageSizeFactory() = delete;
 };
 
-#endif /*PAGESIZEFACTORY_H_*/
+#endif // PAGE_SIZE_FACTORY_H_

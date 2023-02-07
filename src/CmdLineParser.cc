@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2012, 2014 David Kozub <zub at linux.fjfi.cvut.cz>
+ * Copyright (C) 2009, 2012, 2014, 2023 David Kozub <zub at linux.fjfi.cvut.cz>
  *
  * This file is part of dotprint.
  *
@@ -18,8 +18,8 @@
  */
 
 #include <iostream>
-#include <assert.h>
-#include <string.h>
+#include <stdexcept>
+#include <string>
 
 #include <unistd.h>
 #include <getopt.h>
@@ -50,15 +50,15 @@ const char *CmdLineParser::DEFAULT_FONT_FACE = "Courier New";
 const double CmdLineParser::DEFAULT_FONT_SIZE = 11.0;
 
 CmdLineParser::CmdLineParser(int argc, char* const argv[]):
-    m_ProgName((argc>0 && argv[0] != nullptr)? argv[0] : "dotprint"),
-    m_PageSize(PageSizeFactory::GetDefault()),
-    m_PageMargins(MarginsFactory::GetDefault()),
-    m_Landscape(false),
-    m_Preprocessor(PreprocessorFactory::GetDefault()),
-    m_Translator(nullptr),
-    m_OutputFileSet(false),
-    m_FontFace(DEFAULT_FONT_FACE),
-    m_FontSize(DEFAULT_FONT_SIZE)
+    m_progName((argc>0 && argv[0] != nullptr)? argv[0] : "dotprint"),
+    m_pageSize(PageSizeFactory::getDefault()),
+    m_pageMargins(MarginsFactory::getDefault()),
+    m_isLandscape(false),
+    m_preprocessor(PreprocessorFactory::getDefault()),
+    m_translator(nullptr),
+    m_outputFileSet(false),
+    m_fontFace(DEFAULT_FONT_FACE),
+    m_fontSize(DEFAULT_FONT_SIZE)
 {
     while (true)
     {
@@ -72,48 +72,48 @@ CmdLineParser::CmdLineParser(int argc, char* const argv[]):
         {
         case 'p':
             // page
-            SetPageSize(optarg);
+            setPageSize(optarg);
             break;
 
         case 'l':
             // Set landscape mode
-            m_Landscape = true;
+            m_isLandscape = true;
             break;
 
         case 'o':
             // Set output file
-            m_OutputFile = optarg;
-            m_OutputFileSet = true;
+            m_outputFile = optarg;
+            m_outputFileSet = true;
             break;
 
         case 'P':
             // Set preprocessor
-            SetPreprocessor(optarg);
+            setPreprocessor(optarg);
             break;
 
         case 't':
             // Set codepage translator
-            SetTranslator(optarg);
+            setTranslator(optarg);
             break;
 
         case 'f':
             // Set font face
-            SetFontFace(optarg);
+            setFontFace(optarg);
             break;
 
         case 's':
             // Set font size
-            SetFontSize(optarg);
+            setFontSize(optarg);
             break;
 
         case 'm':
             // Set page margins
-            SetPageMargins(optarg);
+            setPageMargins(optarg);
             break;
 
         case 'h':
             // help
-            PrintHelp();
+            printHelp();
             exit(1);
 
         case '?':
@@ -121,204 +121,200 @@ CmdLineParser::CmdLineParser(int argc, char* const argv[]):
             exit(-1);
 
         default:
-            assert(0);
+            throw std::runtime_error("Unexpectd argument");
         }
     }
 
-    if (!m_OutputFileSet)
+    if (!m_outputFileSet)
     {
-        std::cerr << m_ProgName << ": you must specify an output file with --output output.pdf" << std::endl;
+        std::cerr << m_progName << ": you must specify an output file with --output output.pdf\n";
         exit(-1);
     }
 
     // optind is the index of the first file arg
     if (optind >= argc)
     {
-        std::cerr << m_ProgName << ": you must specify an input file!" << std::endl;
+        std::cerr << m_progName << ": you must specify an input file!\n";
         exit(-1);
     }
 
     if (optind + 1 < argc)
     {
-        std::cerr << m_ProgName << ": too many input files. Only single input file is allowed." << std::endl;
+        std::cerr << m_progName << ": too many input files. Only single input file is allowed.\n";
         exit(-1);
     }
 
-    m_InputFile = argv[optind];
+    m_inputFile = argv[optind];
 }
 
-const PageSize &CmdLineParser::GetPageSize() const
+const PageSize &CmdLineParser::getPageSize() const
 {
-    return m_PageSize;
+    return m_pageSize;
 }
 
-const Margins &CmdLineParser::GetPageMargins() const
+const Margins &CmdLineParser::getPageMargins() const
 {
-    return m_PageMargins;
+    return m_pageMargins;
 }
 
-bool CmdLineParser::GetLandscape() const
+bool CmdLineParser::isLandscape() const
 {
-    return m_Landscape;
+    return m_isLandscape;
 }
 
-ICharPreprocessor *CmdLineParser::GetPreprocessor() const
+ICharPreprocessor *CmdLineParser::getPreprocessor() const
 {
-    return m_Preprocessor;
+    return m_preprocessor;
 }
 
-ICodepageTranslator *CmdLineParser::GetCodepageTranslator() const
+ICodepageTranslator *CmdLineParser::getCodepageTranslator() const
 {
-    return m_Translator;
+    return m_translator;
 }
 
-const std::string &CmdLineParser::GetOutputFile() const
+const std::string &CmdLineParser::getOutputFile() const
 {
-    return m_OutputFile;
+    return m_outputFile;
 }
 
-const std::string &CmdLineParser::GetInputFile() const
+const std::string &CmdLineParser::getInputFile() const
 {
-    return m_InputFile;
+    return m_inputFile;
 }
 
-const std::string &CmdLineParser::GetFontFace() const
+const std::string &CmdLineParser::getFontFace() const
 {
-    return m_FontFace;
+    return m_fontFace;
 }
 
-double CmdLineParser::GetFontSize() const
+double CmdLineParser::getFontSize() const
 {
-    return m_FontSize;
+    return m_fontSize;
 }
 
-void CmdLineParser::SetPageSize(const char *arg)
+void CmdLineParser::setPageSize(const char *arg)
 {
     if (!strcmp(arg, "list"))
     {
-        std::cout << m_ProgName << ": supported page sizes:" << std::endl;
-        PageSizeFactory::Print(std::cout);
+        std::cout << m_progName << ": supported page sizes:\n";
+        PageSizeFactory::print(std::cout);
         exit(0);
     }
 
-    const PageSize *p = PageSizeFactory::Lookup(arg);
+    const PageSize *p = PageSizeFactory::lookup(arg);
 
     if (!p)
     {
-        std::cerr << m_ProgName << ": unknown page size. Use --page list to get a list." << std::endl;
+        std::cerr << m_progName << ": unknown page size. Use --page list to get a list.\n";
         exit(1);
     }
 
-    m_PageSize = *p;
+    m_pageSize = *p;
 }
 
-void CmdLineParser::SetPageMargins(const char *arg)
+void CmdLineParser::setPageMargins(const char *arg)
 {
     double mtop, mright, mbottom, mleft;
 
     if (!strcmp(arg, "formats"))
     {
-        std::cout << m_ProgName << ": supported margin formats:" << std::endl << std::endl;
-        std::cout << "number:               one value for all margins." << std::endl;
-        std::cout << "num1,num2:            top & bottom, then left & right." << std::endl;
-        std::cout << "num1,num2,num3:       top, then left & right, then bottom." << std::endl;
-        std::cout << "num1,num2,num3,num4:  top, then right, then bottom, then left." << std::endl;
+        std::cout << m_progName << ": supported margin formats:\n\n"
+            "number:               one value for all margins.\n"
+            "num1,num2:            top & bottom, then left & right.\n"
+            "num1,num2,num3:       top, then left & right, then bottom.\n"
+            "num1,num2,num3,num4:  top, then right, then bottom, then left.\n";
         exit(0);
     }
 
     switch (sscanf(arg, "%lf,%lf,%lf,%lf", &mtop, &mright, &mbottom, &mleft))
     {
-        case 1:
-            m_PageMargins.m_Top = mtop * milimeter;
-            m_PageMargins.m_Right = mtop * milimeter;
-            m_PageMargins.m_Bottom = mtop * milimeter;
-            m_PageMargins.m_Left = mtop * milimeter;
-            break;
-        case 2:
-            m_PageMargins.m_Top = mtop * milimeter;
-            m_PageMargins.m_Right = mright * milimeter;
-            m_PageMargins.m_Bottom = mtop * milimeter;
-            m_PageMargins.m_Left = mright * milimeter;
-            break;
-        case 3:
-            m_PageMargins.m_Top = mtop * milimeter;
-            m_PageMargins.m_Right = mright * milimeter;
-            m_PageMargins.m_Bottom = mbottom * milimeter;
-            m_PageMargins.m_Left = mright * milimeter;
-            break;
-        case 4:
-            m_PageMargins.m_Top = mtop * milimeter;
-            m_PageMargins.m_Right = mright * milimeter;
-            m_PageMargins.m_Bottom = mbottom * milimeter;
-            m_PageMargins.m_Left = mleft * milimeter;
-            break;
-        default:
-            std::cerr << m_ProgName << ": wrong margin format: " << arg << std::endl;
-            std::cerr << m_ProgName << ": Use \"--margins formats\" to get a list of valid formats." << std::endl;
-            exit(1);
+    case 1:
+        m_pageMargins.top = mtop * milimeter;
+        m_pageMargins.right = mtop * milimeter;
+        m_pageMargins.bottom = mtop * milimeter;
+        m_pageMargins.left = mtop * milimeter;
+        break;
+    case 2:
+        m_pageMargins.top = mtop * milimeter;
+        m_pageMargins.right = mright * milimeter;
+        m_pageMargins.bottom = mtop * milimeter;
+        m_pageMargins.left = mright * milimeter;
+        break;
+    case 3:
+        m_pageMargins.top = mtop * milimeter;
+        m_pageMargins.right = mright * milimeter;
+        m_pageMargins.bottom = mbottom * milimeter;
+        m_pageMargins.left = mright * milimeter;
+        break;
+    case 4:
+        m_pageMargins.top = mtop * milimeter;
+        m_pageMargins.right = mright * milimeter;
+        m_pageMargins.bottom = mbottom * milimeter;
+        m_pageMargins.left = mleft * milimeter;
+        break;
+    default:
+        std::cerr << m_progName << ": wrong margin format: " << arg << '\n'
+            << m_progName << ": Use \"--margins formats\" to get a list of valid formats.\n";
+        exit(1);
     }
 }
 
-void CmdLineParser::SetPreprocessor(const char *arg)
+void CmdLineParser::setPreprocessor(const char *arg)
 {
     if (!strcmp(arg, "list"))
     {
-        std::cout << m_ProgName << ": supported preprocessors:" << std::endl;
-        PreprocessorFactory::Print(std::cout);
+        std::cout << m_progName << ": supported preprocessors:\n";
+        PreprocessorFactory::print(std::cout);
         exit(0);
     }
 
-    ICharPreprocessor *p = PreprocessorFactory::Lookup(arg);
+    ICharPreprocessor *p = PreprocessorFactory::lookup(arg);
 
     if (!p)
     {
-        std::cerr << m_ProgName << ": unknown preprocessor. Use --preprocessor list to get a list." << std::endl;
+        std::cerr << m_progName << ": unknown preprocessor. Use --preprocessor list to get a list.\n";
         exit(1);
     }
 
-    m_Preprocessor = p;
+    m_preprocessor = p;
 }
 
-void CmdLineParser::SetTranslator(const char *arg)
+void CmdLineParser::setTranslator(const char *arg)
 {
-    CodepageTranslator *t = new CodepageTranslator();
-
-    t->loadTable(arg);
-
-    m_Translator = t;
+    m_translator = new CodepageTranslator(arg);
 }
 
-void CmdLineParser::SetFontFace(const char *arg)
+void CmdLineParser::setFontFace(const char *arg)
 {
-    m_FontFace = arg;
+    m_fontFace = arg;
 }
 
-void CmdLineParser::SetFontSize(const char *arg)
+void CmdLineParser::setFontSize(const char *arg)
 {
-    if (sscanf(arg, "%lf", &m_FontSize) != 1)
+    if (sscanf(arg, "%lf", &m_fontSize) != 1)
     {
-        std::cerr << m_ProgName << ": wrong font size: " << arg << std::endl;
+        std::cerr << m_progName << ": wrong font size: " << arg << '\n';
     }
 }
 
-void CmdLineParser::PrintHelp()
+void CmdLineParser::printHelp()
 {
-    std::cout << "Usage: " << m_ProgName << " [OPTION]... INPUT_FILE -o OUTPUT_FILE" << std::endl;
-    std::cout << "Convert input text file into a PDF." << std::endl << std::endl;
-
-    std::cout << "  -o, --output        Specify output file (PDF). Required." << std::endl;
-    std::cout << "  -p, --page          Specify page size." << std::endl;
-    std::cout << "                      Use \"-p list\" to see available values." << std::endl;
-    std::cout << "  -l, --landscape     Set landscape mode." << std::endl;
-    std::cout << "  -P, --preprocessor  Select preprocessor to use." << std::endl;
-    std::cout << "                      Use \"-P list\" to see available values." << std::endl;
-    std::cout << "  -t, --translator    Select codepage translator to use." << std::endl;
-    std::cout << "  -f, --font-face     Font to use." << std::endl;
-    std::cout << "                      Default value: \"" << DEFAULT_FONT_FACE << "\"" << std::endl;
-    std::cout << "  -s, --font-size     Font size to use." << std::endl;
-    std::cout << "                      Default value: " << DEFAULT_FONT_SIZE << std::endl;
-    std::cout << "  -m, --margins       Set page margins (in millimeters)." << std::endl;
-    std::cout << "                      Use \"-m formats\" to see available formats." << std::endl;
-    std::cout << "                      Default value: " << MarginsFactory::DEFAULT_MARGIN_VALUE << " mm for all margins." << std::endl;
-    std::cout << "  -h, --help          Display this help." << std::endl;
+    std::cout <<
+        "Usage: " << m_progName << " [OPTION]... INPUT_FILE -o OUTPUT_FILE\n"
+        "Convert input text file into a PDF.\n"
+        "  -o, --output        Specify output file (PDF). Required.\n"
+        "  -p, --page          Specify page size.\n"
+        "                      Use \"-p list\" to see available values.\n"
+        "  -l, --landscape     Set landscape mode.\n"
+        "  -P, --preprocessor  Select preprocessor to use.\n"
+        "                      Use \"-P list\" to see available values.\n"
+        "  -t, --translator    Select codepage translator to use.\n"
+        "  -f, --font-face     Font to use.\n"
+        "                      Default value: \"" << DEFAULT_FONT_FACE << "\"\n"
+        "  -s, --font-size     Font size to use.\n"
+        "                      Default value: " << DEFAULT_FONT_SIZE << "\n"
+        "  -m, --margins       Set page margins (in millimeters).\n"
+        "                      Use \"-m formats\" to see available formats.\n"
+        "                      Default value: " << MarginsFactory::DEFAULT_MARGIN_VALUE << " mm for all margins.\n"
+        "  -h, --help          Display this help.\n";
 }

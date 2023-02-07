@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Peter Kessen <p.kessen at kessen-peter.de>
+ * Copyright (C) 2023 David Kozub <zub at linux.fjfi.cvut.cz>
  *
  * This file is part of dotprint.
  *
@@ -17,6 +18,9 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef CODEPAGE_TRANSLATOR_H
+#define CODEPAGE_TRANSLATOR_H
+
 #include <map>
 #include <sstream>
 #include <string>
@@ -25,9 +29,9 @@
 class CodepageTranslator : public ICodepageTranslator
 {
 public:
-    void loadTable(std::string const& tableName);
+    explicit CodepageTranslator(const std::string &tableName);
 
-    virtual bool translate(uint8_t in, gunichar &out);
+    virtual bool translate(uint8_t in, gunichar &out) override;
 
 private:
     typedef std::map<uint8_t, gunichar> TTransTable;
@@ -35,3 +39,4 @@ private:
     TTransTable m_table;
 };
 
+#endif // CODEPAGE_TRANSLATOR_H

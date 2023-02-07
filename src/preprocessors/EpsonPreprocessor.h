@@ -56,17 +56,17 @@ private:
         Condensed
     };
 
-    InputState m_InputState;
-    EscapeState m_EscapeState;
-    FontSizeState m_FontSizeState;
-    //bool m_Escape;
-    int m_GraphicAssembledBytes;
-    uint8_t m_GraphicsMode; // Graphics mode
-    //int m_GraphicsDpi; // Dots per inch
-    //int m_GraphicsDpc; // Dots per column
-    int m_GraphicsNrColumns; // Number of columns
-    int m_GraphicsMaxBytes; // Number of columns
-    int m_GraphicsCol;
+    InputState m_inputState;
+    EscapeState m_escapeState;
+    FontSizeState m_fontSizeState;
+    //bool m_escape;
+    int m_graphicAssembledBytes;
+    uint8_t m_graphicsMode; // Graphics mode
+    //int m_graphicsDpi; // Dots per inch
+    //int m_graphicsDpc; // Dots per column
+    int m_graphicsNrColumns; // Number of columns
+    int m_graphicsMaxBytes; // Number of columns
+    int m_graphicsCol;
 };
 
 #endif // EPSON_PREPROCESSOR_H_

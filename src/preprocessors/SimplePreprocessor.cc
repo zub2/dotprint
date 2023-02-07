@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2012, 2014 David Kozub <zub at linux.fjfi.cvut.cz>
+ * Copyright (C) 2009, 2012, 2014, 2023 David Kozub <zub at linux.fjfi.cvut.cz>
  *
  * This file is part of dotprint.
  *
@@ -17,10 +17,12 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SimplePreprocessor.h"
+
 #include <iostream>
 #include <iomanip>
+
 #include <glibmm.h>
-#include "SimplePreprocessor.h"
 
 void SimplePreprocessor::process(ICairoTTYProtected &ctty, uint8_t c)
 {
@@ -30,19 +32,16 @@ void SimplePreprocessor::process(ICairoTTYProtected &ctty, uint8_t c)
         switch (c)
         {
         case '\n':
-            ctty.NewLine();
+            ctty.newLine();
             break;
 
         case 0x0c:
-            ctty.NewPage();
+            ctty.newPage();
             break;
 
         default:
-            {
-                int i = c;
-                std::cerr << "SimplePreprocessor::process(): ignoring unknown character 0x"
-                    << std::setfill('0') << std::setw(2) << std::hex << i << std::endl;
-            }
+            std::cerr << "SimplePreprocessor::process(): ignoring unknown character 0x"
+                << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c) << std::endl;
         }
     }
     else

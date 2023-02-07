@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2012, 2014 David Kozub <zub at linux.fjfi.cvut.cz>
+ * Copyright (C) 2009, 2012, 2014, 2023 David Kozub <zub at linux.fjfi.cvut.cz>
  *
  * This file is part of dotprint.
  *
@@ -17,8 +17,8 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PREPROCESSORFACTORY_H_
-#define PREPROCESSORFACTORY_H_
+#ifndef PREPROCESSOR_FACTORY_H_
+#define PREPROCESSOR_FACTORY_H_
 
 #include <iostream>
 #include <string>
@@ -28,11 +28,11 @@
 class PreprocessorFactory
 {
 public:
-    static void Print(std::ostream &s);
-    static ICharPreprocessor* Lookup(const std::string& name);
-    static ICharPreprocessor* GetDefault();
+    static void print(std::ostream &s);
+    static ICharPreprocessor* lookup(const std::string &name);
+    static ICharPreprocessor* getDefault();
 
     PreprocessorFactory() = delete;
 };
 
-#endif /*PREPROCESSORFACTORY_H_*/
+#endif // PREPROCESSOR_FACTORY_H_

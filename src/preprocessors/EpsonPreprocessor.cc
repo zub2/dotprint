@@ -17,23 +17,24 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "EpsonPreprocessor.h"
+
 #include <stdexcept>
 #include <iostream>
 #include <iomanip>
 #include <type_traits>
 
 #include <glibmm.h>
-#include "EpsonPreprocessor.h"
 
 EpsonPreprocessor::EpsonPreprocessor():
-    m_InputState(InputState::InputNormal),
-    m_EscapeState(EscapeState::Entered), // not used unless m_InputState is Escape
-    m_FontSizeState(FontSizeState::FontSizeNormal)
+    m_inputState(InputState::InputNormal),
+    m_escapeState(EscapeState::Entered), // not used unless m_inputState is Escape
+    m_fontSizeState(FontSizeState::FontSizeNormal)
 {}
 
 void EpsonPreprocessor::process(ICairoTTYProtected &ctty, uint8_t c)
 {
-    if (m_InputState == InputState::Escape)
+    if (m_inputState == InputState::Escape)
         handleEscape(ctty, c);
     else
     {
@@ -41,49 +42,49 @@ void EpsonPreprocessor::process(ICairoTTYProtected &ctty, uint8_t c)
         switch (c)
         {
         case 0x0e: // Expanded printing for one line
-            ctty.StretchFont(2.0);
-            m_FontSizeState = FontSizeState::SingleLineExpanded;
+            ctty.stretchFont(2.0);
+            m_fontSizeState = FontSizeState::SingleLineExpanded;
             break;
 
         case 0x14: // Cancel one-line expanded printing
-            ctty.StretchFont(1.0);
-            m_FontSizeState = FontSizeState::FontSizeNormal;
+            ctty.stretchFont(1.0);
+            m_fontSizeState = FontSizeState::FontSizeNormal;
             break;
 
         case 0x0f: // Condensed printing
-            ctty.StretchFont(10.0/17.0); // Change from 10 CPI to 17 CPI
-            m_FontSizeState = FontSizeState::Condensed;
+            ctty.stretchFont(10.0/17.0); // Change from 10 CPI to 17 CPI
+            m_fontSizeState = FontSizeState::Condensed;
             break;
 
         case 0x12: // Cancel condensed printing
-            ctty.StretchFont(1.0);
-            m_FontSizeState = FontSizeState::FontSizeNormal;
+            ctty.stretchFont(1.0);
+            m_fontSizeState = FontSizeState::FontSizeNormal;
             break;
 
         case '\r': // Carriage Return
-            ctty.CarriageReturn();
+            ctty.carriageReturn();
             break;
 
         case '\n': // Line Feed
-            if (m_FontSizeState == FontSizeState::SingleLineExpanded)
+            if (m_fontSizeState == FontSizeState::SingleLineExpanded)
             {
-                ctty.StretchFont(1.0);
-                m_FontSizeState = FontSizeState::FontSizeNormal;
+                ctty.stretchFont(1.0);
+                m_fontSizeState = FontSizeState::FontSizeNormal;
             }
-            ctty.LineFeed();
+            ctty.lineFeed();
             break;
 
         case 0x0c: // Form Feed
-            ctty.NewPage();
+            ctty.newPage();
             break;
 
         case 0x1b: // Escape
-            m_InputState = InputState::Escape;
-            m_EscapeState = EscapeState::Entered;
+            m_inputState = InputState::Escape;
+            m_escapeState = EscapeState::Entered;
             break;
 
         default:
-            ctty.append((char) c);
+            ctty.append(static_cast<char>(c));
             break;
         }
     }
@@ -92,50 +93,47 @@ void EpsonPreprocessor::process(ICairoTTYProtected &ctty, uint8_t c)
 void EpsonPreprocessor::handleEscape(ICairoTTYProtected &ctty, uint8_t c)
 {
     // Determine what escape code follows
-    if (m_EscapeState == EscapeState::Entered)
+    if (m_escapeState == EscapeState::Entered)
     {
         switch (c)
         {
         case 0x45: // Set bold
-            ctty.SetFontWeight(FontWeight::Bold);
+            ctty.setFontWeight(FontWeight::Bold);
             break;
         case 0x46: // Unset bold
-            ctty.SetFontWeight(FontWeight::Normal);
+            ctty.setFontWeight(FontWeight::Normal);
             break;
         case 0x34: // Set italic
-            ctty.SetFontSlant(FontSlant::Italic);
+            ctty.setFontSlant(FontSlant::Italic);
             break;
         case 0x35: // Unset italic
-            ctty.SetFontSlant(FontSlant::Normal);
+            ctty.setFontSlant(FontSlant::Normal);
             break;
         case 0x2a: // '*': Draw Graphics
-            m_GraphicAssembledBytes = 0;
-            m_EscapeState = EscapeState::DrawGraphics;
+            m_graphicAssembledBytes = 0;
+            m_escapeState = EscapeState::DrawGraphics;
             break;
         case 0x2d: // Underline
-            m_EscapeState = EscapeState::Underline;
+            m_escapeState = EscapeState::Underline;
             break;
         case 0x33: // '3': Set n/180-inch line spacing
-            m_EscapeState = EscapeState::SetLineSpacing;
+            m_escapeState = EscapeState::SetLineSpacing;
             break;
         case 0x40: // '@': Initialize
             // TODO: add init for Cairo here
-            m_InputState = InputState::InputNormal; // Leave escape state
+            m_inputState = InputState::InputNormal; // Leave escape state
             break;
         case 0x44: // 'D': Set horizontal tabs
-            m_EscapeState = EscapeState::SetTabWidth;
+            m_escapeState = EscapeState::SetTabWidth;
             break;
         case 0x78: // 'x': Select LQ or draft
-            m_EscapeState = EscapeState::SelectQuality;
+            m_escapeState = EscapeState::SelectQuality;
             break;
 
         default:
-            {
-                int i = c;
-                std::cerr << "EpsonPreprocessor::handleEscape(): ignoring unknown escape ESC 0x"
-                    << std::setfill('0') << std::setw(2) << std::hex << i << std::endl;
-                m_InputState = InputState::InputNormal; // Leave escape state
-            }
+            std::cerr << "EpsonPreprocessor::handleEscape(): ignoring unknown escape ESC 0x"
+                << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c) << std::endl;
+            m_inputState = InputState::InputNormal; // Leave escape state
         }
 
         /*
@@ -144,19 +142,19 @@ void EpsonPreprocessor::handleEscape(ICairoTTYProtected &ctty, uint8_t c)
          *
          * This includes the error condition, as no change is done either.
          */
-        if (m_EscapeState == EscapeState::Entered)
+        if (m_escapeState == EscapeState::Entered)
         {
-            m_InputState = InputState::InputNormal;
+            m_inputState = InputState::InputNormal;
         }
 
         // Allow font to update if it has changed.
-        ctty.UseCurrentFont();
+        ctty.useCurrentFont();
 
         return;
     }
 
     // For multi-byte escapes:
-    switch (m_EscapeState)
+    switch (m_escapeState)
     {
     case EscapeState::Underline: // ESC 0x2d u, turn underline off (0) or on (!0)
         //std::cerr << "escape: ESC 0x2d " << std::hex << c << std::endl;
@@ -170,18 +168,18 @@ void EpsonPreprocessor::handleEscape(ICairoTTYProtected &ctty, uint8_t c)
             // TODO: Cancel underline
             //std::cerr << "EpsonPreprocessor::handleEscape(): Ignoring unsupported escape: DROP UNDERLINE" << std::endl;
         }
-        m_InputState = InputState::InputNormal; // Leave escape state
+        m_inputState = InputState::InputNormal; // Leave escape state
         break;
 
     case EscapeState::SetLineSpacing:
         // TODO: implement line spacing in CairoTTY
-        m_InputState = InputState::InputNormal;
+        m_inputState = InputState::InputNormal;
         break;
 
     case EscapeState::SetTabWidth: // Set width of tabs
         if (0 == c)
         {
-            m_InputState = InputState::InputNormal; // Leave escape state
+            m_inputState = InputState::InputNormal; // Leave escape state
         }
         else
         {
@@ -191,7 +189,7 @@ void EpsonPreprocessor::handleEscape(ICairoTTYProtected &ctty, uint8_t c)
 
     case EscapeState::SelectQuality:
         // TODO: select quality?
-        m_InputState = InputState::InputNormal;
+        m_inputState = InputState::InputNormal;
         break;
 
     case EscapeState::DrawGraphics: // Insert tabs in text
@@ -200,45 +198,45 @@ void EpsonPreprocessor::handleEscape(ICairoTTYProtected &ctty, uint8_t c)
 
     default:
         throw std::runtime_error("EpsonPreprocessor::handleEscape(): Internal error: entered unknown escape state "
-            + std::to_string(static_cast<std::underlying_type_t<decltype(m_EscapeState)>>(m_EscapeState)));
+            + std::to_string(static_cast<std::underlying_type_t<decltype(m_escapeState)>>(m_escapeState)));
     }
 }
 
 void EpsonPreprocessor::handleGraphics(ICairoTTYProtected & /*ctty*/, uint8_t c)
 {
-    if (m_GraphicAssembledBytes == 0)
+    if (m_graphicAssembledBytes == 0)
     {
-        m_GraphicsMode = c;
-        m_GraphicAssembledBytes = 1;
+        m_graphicsMode = c;
+        m_graphicAssembledBytes = 1;
     }
-    else if (m_GraphicAssembledBytes == 1)
+    else if (m_graphicAssembledBytes == 1)
     {
-        m_GraphicsNrColumns = c;
-        m_GraphicAssembledBytes = 2;
+        m_graphicsNrColumns = c;
+        m_graphicAssembledBytes = 2;
     }
-    else if (m_GraphicAssembledBytes == 2)
+    else if (m_graphicAssembledBytes == 2)
     {
-        m_GraphicsNrColumns += c * 256;
-        m_GraphicAssembledBytes = 3;
+        m_graphicsNrColumns += c * 256;
+        m_graphicAssembledBytes = 3;
     }
     else
     {
-        if (m_GraphicAssembledBytes == 3)
+        if (m_graphicAssembledBytes == 3)
         {
-            m_GraphicsMaxBytes = m_GraphicsNrColumns * 3;
+            m_graphicsMaxBytes = m_graphicsNrColumns * 3;
         }
 
-        int rowGroup = m_GraphicAssembledBytes % 3;
-        m_GraphicsCol |= ((unsigned int) c) << (8 * (2 - rowGroup));
+        int rowGroup = m_graphicAssembledBytes % 3;
+        m_graphicsCol |= ((unsigned int) c) << (8 * (2 - rowGroup));
         if (rowGroup == 2)
         {
-            m_GraphicsCol = 0;
+            m_graphicsCol = 0;
         }
 
-        ++m_GraphicAssembledBytes;
-        if (m_GraphicAssembledBytes >= (m_GraphicsMaxBytes + 3))
+        ++m_graphicAssembledBytes;
+        if (m_graphicAssembledBytes >= (m_graphicsMaxBytes + 3))
         {
-            m_InputState = InputState::InputNormal; // Leave escape state
+            m_inputState = InputState::InputNormal; // Leave escape state
         }
     }
 }

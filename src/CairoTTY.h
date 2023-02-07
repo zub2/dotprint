@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2012, 2014 David Kozub <zub at linux.fjfi.cvut.cz>
+ * Copyright (C) 2009, 2012, 2014, 2023 David Kozub <zub at linux.fjfi.cvut.cz>
  *
  * This file is part of dotprint.
  *
@@ -17,60 +17,61 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CAIROTTY_H_
-#define CAIROTTY_H_
+#ifndef CAIRO_TTY_H_
+#define CAIRO_TTY_H_
 
 #include <cstdint>
 #include <string>
 #include <algorithm>
+
 #include <glibmm.h>
 #include <cairomm/cairomm.h>
 
 /** \brief Structure describing page margins. */
 struct Margins
 {
-    Margins(double l, double r, double t, double b):
-        m_Left(l),
-        m_Right(r),
-        m_Top(t),
-        m_Bottom(b)
+    constexpr Margins(double l, double r, double t, double b):
+        left(l),
+        right(r),
+        top(t),
+        bottom(b)
     {}
 
-    Margins(double x, double top, double bottom):
-        m_Left(x),
-        m_Right(x),
-        m_Top(top),
-        m_Bottom(bottom)
+    constexpr Margins(double x, double top, double bottom):
+        left(x),
+        right(x),
+        top(top),
+        bottom(bottom)
     {}
 
     /** \brief Position of the left margin to the right of the page edge. */
-    double m_Left;
+    double left;
 
     /** \brief Position of the right margin to the left of the page edge. */
-    double m_Right;
+    double right;
 
     /** \brief Position of the top margin to the bottom of the page edge. */
-    double m_Top;
+    double top;
 
     /** \brief Position of the bottom margin to the top of the page edge. */
-    double m_Bottom;
+    double bottom;
 };
 
 struct PageSize
 {
-    PageSize(double w = 0.0, double h = 0.0):
-        m_Width(w),
-        m_Height(h)
+    constexpr PageSize(double w = 0.0, double h = 0.0):
+        width(w),
+        height(h)
     {}
 
     /** \brief Flips the page lanscape. */
-    void Landscape()
+    void rotate()
     {
-        std::swap(m_Width, m_Height);
+        std::swap(width, height);
     }
 
-    double m_Width;
-    double m_Height;
+    double width;
+    double height;
 };
 
 enum class FontWeight
@@ -88,26 +89,25 @@ enum class FontSlant
 class ICairoTTYProtected
 {
 public:
-    virtual void SetPageSize(const PageSize &p) = 0;
+    virtual void setPageSize(const PageSize &p) = 0;
 
-    virtual void Home() = 0;
-    virtual void NewLine() = 0;
-    virtual void CarriageReturn() = 0;
-    virtual void LineFeed() = 0;
-    virtual void NewPage() = 0;
+    virtual void home() = 0;
+    virtual void newLine() = 0;
+    virtual void carriageReturn() = 0;
+    virtual void lineFeed() = 0;
+    virtual void newPage() = 0;
 
-    virtual void SetFontName(const std::string family) = 0;
-    virtual void SetFontSize(const double size) = 0;
-    virtual void SetFontWeight(const FontWeight weight) = 0;
-    virtual void SetFontSlant(const FontSlant slant) = 0;
-    virtual void StretchFont(double stretch_x, double stretch_y = 1.0) = 0;
-    virtual void UseCurrentFont() = 0;
+    virtual void setFontName(const std::string &family) = 0;
+    virtual void setFontSize(double size) = 0;
+    virtual void setFontWeight(FontWeight weight) = 0;
+    virtual void setFontSlant(FontSlant slant) = 0;
+    virtual void stretchFont(double stretch_x, double stretch_y = 1.0) = 0;
+    virtual void useCurrentFont() = 0;
 
     virtual void append(char c) = 0;
     virtual void append(gunichar c) = 0;
 
-    virtual ~ICairoTTYProtected()
-    {}
+    virtual ~ICairoTTYProtected() = default;
 };
 
 class ICharPreprocessor
@@ -115,8 +115,7 @@ class ICharPreprocessor
 public:
     virtual void process(ICairoTTYProtected &ctty, uint8_t c) = 0;
 
-    virtual ~ICharPreprocessor()
-    {}
+    virtual ~ICharPreprocessor() = default;
 };
 
 class ICodepageTranslator
@@ -124,8 +123,7 @@ class ICodepageTranslator
 public:
     virtual bool translate(uint8_t in, gunichar &out) = 0;
 
-    virtual ~ICodepageTranslator()
-    {}
+    virtual ~ICodepageTranslator() = default;
 };
 
 class CairoTTY: protected ICairoTTYProtected
@@ -137,53 +135,52 @@ public:
 
     CairoTTY &operator<<(uint8_t c);
 
-    void SetPreprocessor(ICharPreprocessor *preprocessor);
+    void setPreprocessor(ICharPreprocessor *preprocessor);
 
-    virtual void UseCurrentFont();
+    virtual void useCurrentFont() override;
 
-    virtual void SetPageSize(const PageSize &p);
+    virtual void setPageSize(const PageSize &p) override;
 
-    virtual void Home();
-    virtual void NewLine();
-    virtual void CarriageReturn();
-    virtual void LineFeed();
-    virtual void NewPage();
+    virtual void home() override;
+    virtual void newLine() override;
+    virtual void carriageReturn() override;
+    virtual void lineFeed() override;
+    virtual void newPage() override;
 
-    virtual void SetFontName(const std::string family = "Courier New");
-    virtual void SetFontSize(const double size = 10.0);
-    virtual void SetFontWeight(const FontWeight weight = FontWeight::Normal);
-    virtual void SetFontSlant(const FontSlant slant = FontSlant::Italic);
-    virtual void StretchFont(double stretch_x, double stretch_y = 1.0);
+    virtual void setFontName(const std::string &family) override;
+    virtual void setFontSize(double size) override;
+    virtual void setFontWeight(FontWeight weight) override;
+    virtual void setFontSlant(FontSlant slant) override;
+    virtual void stretchFont(double stretch_x, double stretch_y = 1.0) override;
 
-protected:
-    virtual void append(char c);
-    virtual void append(gunichar c);
+    virtual void append(char c) override;
+    virtual void append(gunichar c) override;
 
 private:
-    Cairo::RefPtr<Cairo::PdfSurface> m_CairoSurface;
-    Cairo::RefPtr<Cairo::Context> m_Context;
+    Cairo::RefPtr<Cairo::PdfSurface> m_cairoSurface;
+    Cairo::RefPtr<Cairo::Context> m_context;
 
-    std::string m_FontName;
-    double m_FontSize;
-    FontWeight m_FontWeight;
-    FontSlant m_FontSlant;
-    Cairo::FontExtents m_FontExtents;
+    std::string m_fontName;
+    double m_fontSize;
+    FontWeight m_fontWeight;
+    FontSlant m_fontSlant;
+    Cairo::FontExtents m_fontExtents;
 
-    Margins m_Margins;
-    PageSize m_PageSize;
+    Margins m_margins;
+    PageSize m_pageSize;
 
     double m_x;
     double m_y;
 
-    double m_StretchX;
-    double m_StretchY;
+    double m_stretchX;
+    double m_stretchY;
 
-    ICharPreprocessor *m_Preprocessor;
-    ICodepageTranslator *m_CpTranslator;
+    ICharPreprocessor *m_preprocessor;
+    ICodepageTranslator *m_cpTranslator;
 
-    void SetFont(const std::string &family, double size,
+    void setFont(const std::string &family, double size,
         Cairo::FontSlant slant = Cairo::FONT_SLANT_NORMAL,
         Cairo::FontWeight weight = Cairo::FONT_WEIGHT_NORMAL);
 };
 
-#endif /*CAIROTTY_H_*/
+#endif // CAIRO_TTY_H_

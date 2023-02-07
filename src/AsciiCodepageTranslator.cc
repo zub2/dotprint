@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Peter Kessen <p.kessen at kessen-peter.de>
+ * Copyright (C) 2023 Peter Kessen <zub at linux.fjfi.cvut.cz>
  *
  * This file is part of dotprint.
  *
@@ -18,28 +19,19 @@
  */
 
 #include "AsciiCodepageTranslator.h"
-#include <fstream>
+
 #include <iostream>
-#include <sstream>
 #include <iomanip>
 
 bool AsciiCodepageTranslator::translate(uint8_t in, gunichar &out)
 {
-    bool ret = false;
-
     if (in <= 127)
     {
         out = in;
-        ret = true;
-    }
-    else
-    {
-        int i = in;
-        ret = false;
-        std::cerr << "AsciiCodepageTranslator::translate(): Droppping unknown char 0x"
-            << std::setfill('0') << std::setw(2) << std::hex << i << std::endl;
+        return true;
     }
 
-    return ret;
+    std::cerr << "AsciiCodepageTranslator::translate(): Droppping unknown char 0x"
+        << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(in) << std::endl;
+    return false;
 }
-
