@@ -7,7 +7,7 @@ If you want to use such files now, converting them into PDF is quite useful. You
 
 So this might be useful to you if you are still running some DOS applications, perhaps in dosemu. With some scripting you can make the old DOS applications produce PDFs.
 
-The input file encoding is expected to be a simple singl ebyte encoding, as would be common in the DOS days. It can be specified using a translation table. E.g. if your input file is in CP850 you can run dotprint lik this:
+The input file encoding is expected to be a simple single byte encoding, as would be common in the DOS days. It can be specified using a translation table. E.g. if your input file is in CP850 you can run dotprint like this:
 ```
 dotprint -t tables/cp850.trans --output myfile.pdf myfile.PRN
 ```
@@ -47,7 +47,7 @@ You need to specify:
 
 You can specify also the preprocessor using `-P` option. It defaults to epson. The original idea was to potentially support other printer escape codes. But currently only `epson`, `simple` and `crlf` (with the latter two not processing any escapes).
 
-A typial invocation of dotprint looks like this:
+A typical invocation of dotprint looks like this:
 
     dotprint input-file.txt -o output-file.pdf
 
