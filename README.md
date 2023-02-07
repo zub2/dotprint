@@ -45,9 +45,11 @@ You need to specify:
 * the input file (text input with potential escape sequences, in UTF-8 encoding)
 * the output file (PDF)
 
-You most likely want to specify the preprocessor. By default only newlines are interpreted which is arguably not too useful. So just add `-P epson`:
+You can specify also the preprocessor using `-P` option. It defaults to epson. The original idea was to potentially support other printer escape codes. But currently only `epson`, `simple` and `crlf` (with the latter two not processing any escapes).
 
-    dotprint input-file.txt -o output-file.pdf -P epson
+A typial invocation of dotprint looks like this:
+
+    dotprint input-file.txt -o output-file.pdf
 
 Run `dotprint -h` for a list of all the options.
 

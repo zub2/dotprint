@@ -37,7 +37,7 @@ namespace
         { "epson", &Epson }
     };
 
-    ICharPreprocessor* DEFAULT_PREPROCESSOR = &Simple;
+    ICharPreprocessor* DEFAULT_PREPROCESSOR = &Epson;
 }
 
 void PreprocessorFactory::print(std::ostream &s)
@@ -59,5 +59,5 @@ ICharPreprocessor* PreprocessorFactory::lookup(const std::string& name)
 
 ICharPreprocessor* PreprocessorFactory::getDefault()
 {
-    return PREPROCESSORS.begin()->second;
+    return DEFAULT_PREPROCESSOR;
 }
