@@ -1,5 +1,5 @@
 # What is it?
-dotprint is a tool that can be used to convert text files that include escape sequences for dot matrix printers into PDF files.
+dotprint is a tool that can be used to convert text files that include escape sequences for Epson dot matrix printers into PDF files.
 
 Nowadays you are not likely to come across such files often but they were common in the "bad old days" of DOS. Programs would often assume an "epson-compatible" dot matrix printer and would embed the escape sequences (for e.g. condensed or expanded font) into the output.
 
@@ -7,14 +7,11 @@ If you want to use such files now, converting them into PDF is quite useful. You
 
 So this might be useful to you if you are still running some DOS applications, perhaps in dosemu. With some scripting you can make the old DOS applications produce PDFs.
 
-In difference to previous versions: dotprint does not expect the input to be in UTF-8 encoding, which is something a DOS application would most likely *not* produce.
-So no conversion of the input file is necessary.
-You can define your encoding by a commandline switch.
-Assuming your Input file is in CP850 you can specify the encoding with a translation table:
+The input file encoding is expected to be a simple singl ebyte encoding, as would be common in the DOS days. It can be specified using a translation table. E.g. if your input file is in CP850 you can run dotprint lik this:
 ```
 dotprint -t tables/cp850.trans --output myfile.pdf myfile.PRN
 ```
-Those translation files are delivered with dotprint in the tables folder.
+The translation files are delivered with dotprint in the tables folder.
 TODO: Specifiy an installation directory for the translation tables and reference this folder here.
 
 # Compiling
@@ -56,29 +53,23 @@ Run `dotprint -h` for a list of all the options.
 
 # Building Docker Container
 
-This might be useful if you're using macOS and don't have development tools or
-C++ compiler, but have Docker.
+This might be useful if you're using macOS and don't have development tools or C++ compiler, but have Docker.
 
 To build the docker container, run:
 
     ./build-docker.sh
 
-This will build `dotprint:latest` image based on `alpine:latest` with some
-preinstalled font (including the Courier New, which is used by default).
+This will build `dotprint:latest` image based on `alpine:latest` with some preinstalled font (including the Courier New, which is used by default).
 
 # Running in Docker
-
-
 
 The easy way to run conversion is:
 
     ./convert.sh input.prn -o output.pdf
 
-Docker container has `dotprint` as an entry point and any options specified on
-the command line are the commands are passed to the dotprint executable.
+Docker container has `dotprint` as an entry point and any options specified on the command line are the commands are passed to the dotprint executable.
 
-If you need to run this manually, you'd need to volume-mount the current
-directory to `/work` directory of the container, i.e.:
+If you need to run this manually, you'd need to volume-mount the current directory to `/work` directory of the container, i.e.:
 
     docker run --rm -v `pwd`:/work dotprint \
         -P epson \
