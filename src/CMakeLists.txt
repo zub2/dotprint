@@ -3,26 +3,26 @@ pkg_check_modules(GLIBMM REQUIRED IMPORTED_TARGET glibmm-2.4)
 pkg_check_modules(CAIROMM REQUIRED IMPORTED_TARGET cairomm-1.0)
 
 add_executable(dotprint
-    DotPrint.cc
-    CmdLineParser.cc
+    DotPrint.cpp
+    CmdLineParser.cpp
     CmdLineParser.h
-    CairoTTY.cc
+    CairoTTY.cpp
     CairoTTY.h
-    AsciiCodepageTranslator.cc
+    AsciiCodepageTranslator.cpp
     AsciiCodepageTranslator.h
-    CodepageTranslator.cc
+    CodepageTranslator.cpp
     CodepageTranslator.h
-    MarginsFactory.cc
+    MarginsFactory.cpp
     MarginsFactory.h
-    PageSizeFactory.cc
+    PageSizeFactory.cpp
     PageSizeFactory.h
-    PreprocessorFactory.cc
+    PreprocessorFactory.cpp
     PreprocessorFactory.h
-    preprocessors/SimplePreprocessor.cc
+    preprocessors/SimplePreprocessor.cpp
     preprocessors/SimplePreprocessor.h
-    preprocessors/CRLFPreprocessor.cc
+    preprocessors/CRLFPreprocessor.cpp
     preprocessors/CRLFPreprocessor.h
-    preprocessors/EpsonPreprocessor.cc
+    preprocessors/EpsonPreprocessor.cpp
     preprocessors/EpsonPreprocessor.h
 )
 target_link_libraries(dotprint PkgConfig::GLIBMM PkgConfig::CAIROMM)
