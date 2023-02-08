@@ -1,9 +1,4 @@
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(GLIBMM REQUIRED IMPORTED_TARGET glibmm-2.4)
-pkg_check_modules(CAIROMM REQUIRED IMPORTED_TARGET cairomm-1.0)
-
-add_executable(dotprint
-    DotPrint.cpp
+add_library(dotpring-objs OBJECT
     CmdLineParser.cpp
     CmdLineParser.h
     CairoTTY.cpp
@@ -25,7 +20,10 @@ add_executable(dotprint
     preprocessors/EpsonPreprocessor.cpp
     preprocessors/EpsonPreprocessor.h
 )
-target_link_libraries(dotprint PkgConfig::GLIBMM PkgConfig::CAIROMM)
+target_link_libraries(dotpring-objs PkgConfig::GLIBMM PkgConfig::CAIROMM)
+
+add_executable(dotprint DotPrint.cpp)
+target_link_libraries(dotprint dotpring-objs)
 
 # pkg-config returns also transitive dependencies (i.e. what do glibmm and cairomm
 # depend on) but the dynamic linker can handle it itself, there is no need to have

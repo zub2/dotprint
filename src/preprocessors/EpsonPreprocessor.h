@@ -28,6 +28,12 @@ public:
     EpsonPreprocessor();
     virtual void process(ICairoTTYProtected &ctty, uint8_t c) override;
 
+    // normal font is expected to be 17 character per inch
+    static constexpr int STANDARD_CPI = 17;
+
+    // condensed printing
+    static constexpr int CONDENSED_CPI = 10;
+
 private:
     void handleEscape(ICairoTTYProtected &ctty, uint8_t c);
     void handleGraphics(ICairoTTYProtected &ctty, uint8_t c);

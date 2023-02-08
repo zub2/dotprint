@@ -52,7 +52,7 @@ void EpsonPreprocessor::process(ICairoTTYProtected &ctty, uint8_t c)
             break;
 
         case 0x0f: // Condensed printing
-            ctty.stretchFont(10.0/17.0); // Change from 10 CPI to 17 CPI
+            ctty.stretchFont(static_cast<double>(CONDENSED_CPI)/STANDARD_CPI); // Change from 10 CPI to 17 CPI
             m_fontSizeState = FontSizeState::Condensed;
             break;
 

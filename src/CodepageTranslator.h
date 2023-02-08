@@ -22,9 +22,17 @@
 #define CODEPAGE_TRANSLATOR_H
 
 #include <map>
-#include <sstream>
 #include <string>
+#include <stdexcept>
+
+#include <glibmm.h>
+
 #include "CairoTTY.h"
+
+class CodepageTableParseException : public std::runtime_error
+{
+    using std::runtime_error::runtime_error;
+};
 
 class CodepageTranslator : public ICodepageTranslator
 {

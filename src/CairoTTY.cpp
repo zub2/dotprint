@@ -24,7 +24,7 @@
 
 CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor,
     std::unique_ptr<ICodepageTranslator> translator):
-    m_cairoSurface(cs),
+    m_cairoSurface(std::move(cs)),
     m_fontName("Courier New"),
     m_fontSize(10.0),
     m_fontWeight(FontWeight::Normal),

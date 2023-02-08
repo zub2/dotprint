@@ -24,15 +24,16 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <system_error>
+#include <cerrno>
 
 CodepageTranslator::CodepageTranslator(const std::string &tableName)
 {
-    std::fstream f(tableName, std::fstream::in);
-
+    std::ifstream f(tableName);
     if (!f.is_open())
     {
-        std::cerr << "Unable to load translation file: " << tableName << std::endl;
-        exit(1);
+        const int e = errno;
+        throw std::system_error(e, std::generic_category(), "can't open " + tableName);
     }
 
     std::string line;
@@ -56,20 +57,26 @@ CodepageTranslator::CodepageTranslator(const std::string &tableName)
             ss1 >> std::hex >> c >> uni;
             if (c > 0xFF)
             {
-                std::cerr << "Could not parse line. Character value to high: " << text << std::endl;
-                exit(1);
+                throw CodepageTableParseException("Could not parse line. Character value too high: " + text);
             }
-            uint8_t ch = (uint8_t) c;
+
+            const uint8_t ch = static_cast<uint8_t>(c);
             if (uni.substr(0, 2) != "U+")
             {
-                std::cerr << "Could not parse line. Unicode value not correctly formatted: " << text << std::endl;
-                exit(1);
+                throw CodepageTableParseException("Could not parse line. Unicode value not correctly formatted: " + text);
             }
+
             std::stringstream ss2(uni.substr(2));
             gunichar unichar;
             ss2 >> std::hex >> unichar;
             m_table.insert({ch, unichar});
         }
+    }
+
+    if (f.bad())
+    {
+        const int e = errno;
+        throw std::system_error(e, std::generic_category(), "can't read " + tableName);
     }
 }
 
