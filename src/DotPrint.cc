@@ -37,8 +37,8 @@ int main(int argc, char *argv[])
     if (cmdline.isLandscape())
         p.rotate();
 
-    ICharPreprocessor *preproc = cmdline.getPreprocessor();
-    ICodepageTranslator *translator = cmdline.getCodepageTranslator();
+    ICharPreprocessor *preprocessor = cmdline.getPreprocessor();
+    auto translator = cmdline.getCodepageTranslator();
 
     Cairo::RefPtr<Cairo::PdfSurface> cs = Cairo::PdfSurface::create(cmdline.getOutputFile(), p.width, p.height);
     if (!cs)
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 
     Margins m = cmdline.getPageMargins();
 
-    CairoTTY ctty(cs, p, m, preproc, translator);
+    CairoTTY ctty(cs, p, m, preprocessor, std::move(translator));
 
     // Set the font
     ctty.setFontName(cmdline.getFontFace());

@@ -28,6 +28,7 @@
 #include "PageSizeFactory.h"
 #include "MarginsFactory.h"
 #include "PreprocessorFactory.h"
+#include "AsciiCodepageTranslator.h"
 #include "CodepageTranslator.h"
 
 const struct option CmdLineParser::LONG_OPTIONS[] =
@@ -55,7 +56,6 @@ CmdLineParser::CmdLineParser(int argc, char* const argv[]):
     m_pageMargins(MarginsFactory::getDefault()),
     m_isLandscape(false),
     m_preprocessor(PreprocessorFactory::getDefault()),
-    m_translator(nullptr),
     m_outputFileSet(false),
     m_fontFace(DEFAULT_FONT_FACE),
     m_fontSize(DEFAULT_FONT_SIZE)
@@ -167,9 +167,15 @@ ICharPreprocessor *CmdLineParser::getPreprocessor() const
     return m_preprocessor;
 }
 
-ICodepageTranslator *CmdLineParser::getCodepageTranslator() const
+std::unique_ptr<ICodepageTranslator> CmdLineParser::getCodepageTranslator() const
 {
-    return m_translator;
+    if (!m_translatorArg.empty())
+    {
+        return std::make_unique<CodepageTranslator>(m_translatorArg);
+    }
+
+    // nothing specified, fall back to ASCII
+    return std::make_unique<AsciiCodepageTranslator>();
 }
 
 const std::string &CmdLineParser::getOutputFile() const
@@ -281,7 +287,7 @@ void CmdLineParser::setPreprocessor(const char *arg)
 
 void CmdLineParser::setTranslator(const char *arg)
 {
-    m_translator = new CodepageTranslator(arg);
+    m_translatorArg = arg;
 }
 
 void CmdLineParser::setFontFace(const char *arg)

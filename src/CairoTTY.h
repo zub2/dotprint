@@ -21,6 +21,7 @@
 #define CAIRO_TTY_H_
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <algorithm>
 
@@ -129,7 +130,8 @@ public:
 class CairoTTY: protected ICairoTTYProtected
 {
 public:
-    CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor, ICodepageTranslator *translator);
+    CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor,
+        std::unique_ptr<ICodepageTranslator> translator);
 
     virtual ~CairoTTY();
 
@@ -176,7 +178,7 @@ private:
     double m_stretchY;
 
     ICharPreprocessor *m_preprocessor;
-    ICodepageTranslator *m_cpTranslator;
+    std::unique_ptr<ICodepageTranslator> m_cpTranslator;
 
     void setFont(const std::string &family, double size,
         Cairo::FontSlant slant = Cairo::FONT_SLANT_NORMAL,

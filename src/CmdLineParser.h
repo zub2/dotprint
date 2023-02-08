@@ -20,6 +20,9 @@
 #ifndef CMD_LINE_PARSER_H_
 #define CMD_LINE_PARSER_H_
 
+#include <string>
+#include <memory>
+
 #include "CairoTTY.h"
 
 class CmdLineParser
@@ -32,7 +35,7 @@ public:
     const std::string & getOutputFile() const;
     const std::string & getInputFile() const;
     ICharPreprocessor * getPreprocessor() const;
-    ICodepageTranslator * getCodepageTranslator() const;
+    std::unique_ptr<ICodepageTranslator> getCodepageTranslator() const;
     const std::string & getFontFace() const;
     double getFontSize() const;
 
@@ -59,7 +62,7 @@ private:
     Margins m_pageMargins;
     bool m_isLandscape;
     ICharPreprocessor *m_preprocessor;
-    ICodepageTranslator *m_translator;
+    std::string m_translatorArg;
     std::string m_outputFile;
     bool m_outputFileSet;
     std::string m_inputFile;

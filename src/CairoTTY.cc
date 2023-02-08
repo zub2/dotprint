@@ -22,10 +22,8 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "AsciiCodepageTranslator.h"
-#include "CodepageTranslator.h"
-
-CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor, ICodepageTranslator *translator):
+CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const Margins &m, ICharPreprocessor *preprocessor,
+    std::unique_ptr<ICodepageTranslator> translator):
     m_cairoSurface(cs),
     m_fontName("Courier New"),
     m_fontSize(10.0),
@@ -33,7 +31,7 @@ CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const
     m_fontSlant(FontSlant::Normal),
     m_margins(m),
     m_preprocessor(preprocessor),
-    m_cpTranslator(translator)
+    m_cpTranslator(std::move(translator))
 {
     m_context = Cairo::Context::create(m_cairoSurface);
 
@@ -185,12 +183,6 @@ void CairoTTY::stretchFont(double stretch_x, double stretch_y)
 void CairoTTY::append(char c)
 {
     gunichar uc;
-
-    if (!m_cpTranslator)
-    {
-        m_cpTranslator = new AsciiCodepageTranslator();
-    }
-
     if (m_cpTranslator->translate(c, uc))
     {
         append(uc);
