@@ -19,11 +19,12 @@ TODO: Specifiy an installation directory for the translation tables and referenc
 First you need to install the required dependencies. These are:
 
 * glibmm-2.4
-* cairomm-10.
+* cairomm-1.0
+* boost test (optional, needed to run tests)
 
 In Debian/Ubuntu you can get them via:
 
-    apt install libglibmm-2.4-dev libcairomm-1.0-dev
+    apt install libglibmm-2.4-dev libcairomm-1.0-dev libboost-test-dev
 
 CMake is used for the build. It's possible to configure and build the program by:
 
@@ -42,10 +43,11 @@ You can specify your own `DESTDIR`.
 
 You need to specify:
 
-* the input file (text input with potential escape sequences, in UTF-8 encoding)
+* the input file (text input with potential escape sequences)
 * the output file (PDF)
+* unless the text in the file is pure ascii, the encoding (-t)
 
-You can specify also the preprocessor using `-P` option. It defaults to epson. The original idea was to potentially support other printer escape codes. But currently only `epson`, `simple` and `crlf` (with the latter two not processing any escapes).
+You can specify also the preprocessor using the `-P` option. It defaults to epson. The original idea was to potentially support other printer escape codes. But currently only `epson`, `simple` and `crlf` (with the latter two not processing any escapes).
 
 A typical invocation of dotprint looks like this:
 
@@ -53,7 +55,8 @@ A typical invocation of dotprint looks like this:
 
 Run `dotprint -h` for a list of all the options.
 
-# Building Docker Container
+# Docker
+## Building Docker Container
 
 This might be useful if you're using macOS and don't have development tools or C++ compiler, but have Docker.
 
@@ -63,7 +66,7 @@ To build the docker container, run:
 
 This will build `dotprint:latest` image based on `alpine:latest` with some preinstalled font (including the Courier New, which is used by default).
 
-# Running in Docker
+## Running in Docker
 
 The easy way to run conversion is:
 
