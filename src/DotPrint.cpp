@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     // Set the font
     ctty.setFontName(cmdline.getFontFace());
     ctty.setFontSize(cmdline.getFontSize());
-    ctty.useCurrentFont();
+    ctty.home();
 
     std::fstream f(cmdline.getInputFile(), std::fstream::in | std::fstream::binary);
     if (!f.is_open())

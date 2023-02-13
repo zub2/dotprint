@@ -29,6 +29,7 @@ CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const
     m_fontSize(10.0),
     m_fontWeight(FontWeight::Normal),
     m_fontSlant(FontSlant::Normal),
+    m_needFontChange(true),
     m_margins(m),
     m_preprocessor(preprocessor),
     m_cpTranslator(std::move(translator))
@@ -36,10 +37,8 @@ CairoTTY::CairoTTY(Cairo::RefPtr<Cairo::PdfSurface> cs, const PageSize &p, const
     m_context = Cairo::Context::create(m_cairoSurface);
 
     setPageSize(p);
-
     stretchFont(1.0, 1.0);
-    useCurrentFont();
-
+    setFont();
     home();
 }
 
@@ -74,35 +73,39 @@ void CairoTTY::setFont(const std::string &family, double size, Cairo::FontSlant 
     m_context->select_font_face(family, slant, weight);
     m_context->set_font_size(size);
 
-    m_context->get_font_extents(m_fontExtents);
+    m_fontExtents.emplace();
+    m_context->get_font_extents(*m_fontExtents);
 }
 
-void CairoTTY::useCurrentFont()
+void CairoTTY::setFont()
 {
-    Cairo::FontWeight weight;
-    Cairo::FontSlant slant;
-
-    switch (m_fontWeight)
+    if (m_needFontChange)
     {
-    case FontWeight::Bold:
-        weight = Cairo::FONT_WEIGHT_BOLD;
-        break;
-    default:
-        weight = Cairo::FONT_WEIGHT_NORMAL;
-        break;
-    }
+        Cairo::FontWeight weight;
+        Cairo::FontSlant slant;
 
-    switch (m_fontSlant)
-    {
-    case FontSlant::Italic:
-        slant = Cairo::FONT_SLANT_ITALIC;
-        break;
-    default:
-        slant = Cairo::FONT_SLANT_NORMAL;
-        break;
-    }
+        switch (m_fontWeight)
+        {
+        case FontWeight::Bold:
+            weight = Cairo::FONT_WEIGHT_BOLD;
+            break;
+        default:
+            weight = Cairo::FONT_WEIGHT_NORMAL;
+            break;
+        }
 
-    setFont(m_fontName, m_fontSize, slant, weight);
+        switch (m_fontSlant)
+        {
+        case FontSlant::Italic:
+            slant = Cairo::FONT_SLANT_ITALIC;
+            break;
+        default:
+            slant = Cairo::FONT_SLANT_NORMAL;
+            break;
+        }
+
+        setFont(m_fontName, m_fontSize, slant, weight);
+    }
 }
 
 void CairoTTY::setPageSize(const PageSize &p)
@@ -123,7 +126,7 @@ void CairoTTY::setPageSize(const PageSize &p)
 void CairoTTY::home()
 {
     m_x = 0.0;
-    m_y = m_fontExtents.height * m_stretchY; // so that the top of the first line touches 0.0
+    m_y = m_fontExtents->height * m_stretchY; // so that the top of the first line touches 0.0
 }
 
 void CairoTTY::newLine()
@@ -139,7 +142,7 @@ void CairoTTY::carriageReturn()
 
 void CairoTTY::lineFeed()
 {
-    m_y += m_fontExtents.height * m_stretchY;
+    m_y += m_fontExtents->height * m_stretchY;
 
     // check if we still fit on the page
     if (m_margins.top + m_y > m_pageSize.height - m_margins.bottom)
@@ -157,21 +160,25 @@ void CairoTTY::newPage()
 void CairoTTY::setFontName(const std::string &family)
 {
     m_fontName = family;
+    m_needFontChange = true;
 }
 
 void CairoTTY::setFontSize(double size)
 {
     m_fontSize = size;
+    m_needFontChange = true;
 }
 
 void CairoTTY::setFontWeight(FontWeight weight)
 {
     m_fontWeight = weight;
+    m_needFontChange = true;
 }
 
 void CairoTTY::setFontSlant(FontSlant slant)
 {
     m_fontSlant = slant;
+    m_needFontChange = true;
 }
 
 void CairoTTY::stretchFont(double stretch_x, double stretch_y)
@@ -201,6 +208,9 @@ void CairoTTY::append(gunichar c)
         std::cout << "Cannot print character 0x" << std::hex << c << std::endl;
         return;
     }
+
+    setFont();
+
     Glib::ustring s(1, c);
 
     Cairo::TextExtents t;

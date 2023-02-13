@@ -147,9 +147,6 @@ void EpsonPreprocessor::handleEscape(ICairoTTYProtected &ctty, uint8_t c)
             m_inputState = InputState::InputNormal;
         }
 
-        // Allow font to update if it has changed.
-        ctty.useCurrentFont();
-
         return;
     }
 

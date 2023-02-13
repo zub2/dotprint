@@ -24,6 +24,7 @@
 #include <memory>
 #include <string>
 #include <algorithm>
+#include <optional>
 
 #include <glibmm.h>
 #include <cairomm/cairomm.h>
@@ -90,8 +91,6 @@ enum class FontSlant
 class ICairoTTYProtected
 {
 public:
-    virtual void setPageSize(const PageSize &p) = 0;
-
     virtual void home() = 0;
     virtual void newLine() = 0;
     virtual void carriageReturn() = 0;
@@ -103,10 +102,8 @@ public:
     virtual void setFontWeight(FontWeight weight) = 0;
     virtual void setFontSlant(FontSlant slant) = 0;
     virtual void stretchFont(double stretch_x, double stretch_y = 1.0) = 0;
-    virtual void useCurrentFont() = 0;
 
     virtual void append(char c) = 0;
-    virtual void append(gunichar c) = 0;
 
     virtual ~ICairoTTYProtected() = default;
 };
@@ -139,24 +136,23 @@ public:
 
     void setPreprocessor(ICharPreprocessor *preprocessor);
 
-    virtual void useCurrentFont() override;
+    virtual void setFontName(const std::string &family) override;
+    virtual void setFontSize(double size) override;
 
-    virtual void setPageSize(const PageSize &p) override;
-
+    void setPageSize(const PageSize &p);
     virtual void home() override;
+
+protected:
     virtual void newLine() override;
     virtual void carriageReturn() override;
     virtual void lineFeed() override;
     virtual void newPage() override;
 
-    virtual void setFontName(const std::string &family) override;
-    virtual void setFontSize(double size) override;
     virtual void setFontWeight(FontWeight weight) override;
     virtual void setFontSlant(FontSlant slant) override;
     virtual void stretchFont(double stretch_x, double stretch_y = 1.0) override;
 
     virtual void append(char c) override;
-    virtual void append(gunichar c) override;
 
 private:
     Cairo::RefPtr<Cairo::PdfSurface> m_cairoSurface;
@@ -166,7 +162,8 @@ private:
     double m_fontSize;
     FontWeight m_fontWeight;
     FontSlant m_fontSlant;
-    Cairo::FontExtents m_fontExtents;
+    bool m_needFontChange;
+    std::optional<Cairo::FontExtents> m_fontExtents;
 
     Margins m_margins;
     PageSize m_pageSize;
@@ -180,6 +177,19 @@ private:
     ICharPreprocessor *m_preprocessor;
     std::unique_ptr<ICodepageTranslator> m_cpTranslator;
 
+    void append(gunichar c);
+
+    /**
+     * Set the current font in the Cairo surface and update m_fontExtents.
+     *
+     * Internally uses the m_needFontChange flag to determine if the action
+     * is really needed. If not needed, this function does nothing.
+     */
+    void setFont();
+
+    /**
+     * Set a specific font in the Cairo surface and update m_fontExtents.
+     */
     void setFont(const std::string &family, double size,
         Cairo::FontSlant slant = Cairo::FONT_SLANT_NORMAL,
         Cairo::FontWeight weight = Cairo::FONT_WEIGHT_NORMAL);
