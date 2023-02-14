@@ -90,7 +90,7 @@ bool CodepageTranslator::translate(uint8_t in, gunichar &out)
         return true;
     }
 
-    std::cerr << "CodepageTranslator::translate(): Droppping unknown char 0x"
+    std::cerr << "CodepageTranslator::translate(): Dropping unknown char 0x"
         << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(in) << std::endl;
     return false;
 }
