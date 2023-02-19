@@ -44,6 +44,7 @@ protected:
     void setPageMargins(const char *arg);
     void setPreprocessor(const char *arg);
     void setTranslator(const char *arg);
+    void setIconvTranslator(const char *arg);
     void setFontFace(const char *arg);
     void setFontSize(const char *arg);
 
@@ -63,6 +64,7 @@ private:
     bool m_isLandscape;
     ICharPreprocessor *m_preprocessor;
     std::string m_translatorArg;
+    std::string m_iconvTranslatorArg;
     std::string m_outputFile;
     bool m_outputFileSet;
     std::string m_inputFile;

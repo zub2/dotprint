@@ -2,8 +2,10 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <glibmm.h>
+
 #include "TestData.h"
-#include "CodepageTranslator.h"
+#include "translators/CodepageTranslator.h"
 
 namespace
 {

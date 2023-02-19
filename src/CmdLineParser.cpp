@@ -28,8 +28,9 @@
 #include "PageSizeFactory.h"
 #include "MarginsFactory.h"
 #include "PreprocessorFactory.h"
-#include "AsciiCodepageTranslator.h"
-#include "CodepageTranslator.h"
+#include "translators/AsciiCodepageTranslator.h"
+#include "translators/CodepageTranslator.h"
+#include "translators/IconvCodepageTranslator.h"
 
 const struct option CmdLineParser::LONG_OPTIONS[] =
 {
@@ -38,6 +39,7 @@ const struct option CmdLineParser::LONG_OPTIONS[] =
     {"output",      required_argument,  0,  'o'},
     {"preprocessor",required_argument,  0,  'P'},
     {"translator",  required_argument,  0,  't'},
+    {"iconv-translator", required_argument, 0, 'T'},
     {"font-face",   required_argument,  0,  'f'},
     {"font-size",   required_argument,  0,  's'},
     {"margins",     required_argument,  0,  'm'},
@@ -45,7 +47,7 @@ const struct option CmdLineParser::LONG_OPTIONS[] =
     { 0, 0, 0, 0 }
 };
 
-const char *CmdLineParser::SHORT_OPTIONS="p:lo:P:t:f:s:m:h";
+const char *CmdLineParser::SHORT_OPTIONS="p:lo:P:t:T:f:s:m:h";
 
 const char *CmdLineParser::DEFAULT_FONT_FACE = "Courier New";
 const double CmdLineParser::DEFAULT_FONT_SIZE = 11.0;
@@ -87,32 +89,30 @@ CmdLineParser::CmdLineParser(int argc, char* const argv[]):
             break;
 
         case 'P':
-            // Set preprocessor
             setPreprocessor(optarg);
             break;
 
         case 't':
-            // Set codepage translator
             setTranslator(optarg);
             break;
 
+        case 'T':
+            setIconvTranslator(optarg);
+            break;
+
         case 'f':
-            // Set font face
             setFontFace(optarg);
             break;
 
         case 's':
-            // Set font size
             setFontSize(optarg);
             break;
 
         case 'm':
-            // Set page margins
             setPageMargins(optarg);
             break;
 
         case 'h':
-            // help
             printHelp();
             exit(1);
 
@@ -128,6 +128,12 @@ CmdLineParser::CmdLineParser(int argc, char* const argv[]):
     if (!m_outputFileSet)
     {
         std::cerr << m_progName << ": you must specify an output file with --output output.pdf\n";
+        exit(-1);
+    }
+
+    if (!m_translatorArg.empty() && !m_iconvTranslatorArg.empty())
+    {
+        std::cerr << m_progName << ": at most one of -t and -T may be specified\n";
         exit(-1);
     }
 
@@ -169,6 +175,11 @@ ICharPreprocessor *CmdLineParser::getPreprocessor() const
 
 std::unique_ptr<ICodepageTranslator> CmdLineParser::getCodepageTranslator() const
 {
+    if (!m_iconvTranslatorArg.empty())
+    {
+        return std::make_unique<IconvCodepageTranslator>(m_iconvTranslatorArg);
+    }
+
     if (!m_translatorArg.empty())
     {
         return std::make_unique<CodepageTranslator>(m_translatorArg);
@@ -290,6 +301,11 @@ void CmdLineParser::setTranslator(const char *arg)
     m_translatorArg = arg;
 }
 
+void CmdLineParser::setIconvTranslator(const char *arg)
+{
+    m_iconvTranslatorArg = arg;
+}
+
 void CmdLineParser::setFontFace(const char *arg)
 {
     m_fontFace = arg;
@@ -315,6 +331,10 @@ void CmdLineParser::printHelp()
         "  -P, --preprocessor  Select preprocessor to use.\n"
         "                      Use \"-P list\" to see available values.\n"
         "  -t, --translator    Select codepage translator to use.\n"
+        "                      Use a translation file as argument.\n"
+        "  -T, --iconv-translator Use iconv for translating the input.\n"
+        "                      Use a character set name that iconv can recognize\n"
+        "                      like CP850. Only single-byte encodings are supported.\n"
         "  -f, --font-face     Font to use.\n"
         "                      Default value: \"" << DEFAULT_FONT_FACE << "\"\n"
         "  -s, --font-size     Font size to use.\n"

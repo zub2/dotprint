@@ -19,6 +19,7 @@ if(Boost_UNIT_TEST_FRAMEWORK_FOUND)
         TestData.h
         TestData.cpp
         TestCodepageTranslator.cpp
+        TestIconvCodepageTranslator.cpp
         TestEpsonPreprocessor.cpp
     )
     target_include_directories(tests PRIVATE ../src)

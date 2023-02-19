@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2020 Peter Kessen <p.kessen at kessen-peter.de>
- * Copyright (C) 2023 David Kozub <zub at linux.fjfi.cvut.cz>
+ * Copyright (C) 2023 Peter Kessen <p.kessen at kessen-peter.de>
  *
  * This file is part of dotprint.
  *
@@ -18,16 +17,26 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ASCII_CODEPAGE_TRANSLATOR_H_
-#define ASCII_CODEPAGE_TRANSLATOR_H_
+#ifndef ICONV_CODEPAGE_TRANSLATOR_H
+#define ICONV_CODEPAGE_TRANSLATOR_H
 
-#include <cstdint>
-#include "CairoTTY.h"
+#include <string>
 
-class AsciiCodepageTranslator : public ICodepageTranslator
+#include <glibmm.h>
+#include <iconv.h>
+
+#include "../CairoTTY.h"
+
+class IconvCodepageTranslator : public ICodepageTranslator
 {
 public:
+    explicit IconvCodepageTranslator(const std::string &sourceEncodingName);
+    ~IconvCodepageTranslator();
+
     virtual bool translate(uint8_t in, gunichar &out) override;
+
+private:
+    iconv_t m_iconvDescriptor;
 };
 
-#endif // ASCII_CODEPAGE_TRANSLATOR_H_
+#endif // ICONV_CODEPAGE_TRANSLATOR_H

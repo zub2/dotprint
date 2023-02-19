@@ -18,33 +18,16 @@
  * along with dotprint. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CODEPAGE_TRANSLATOR_H
-#define CODEPAGE_TRANSLATOR_H
+#ifndef ASCII_CODEPAGE_TRANSLATOR_H_
+#define ASCII_CODEPAGE_TRANSLATOR_H_
 
-#include <map>
-#include <string>
-#include <stdexcept>
+#include <cstdint>
+#include "../CairoTTY.h"
 
-#include <glibmm.h>
-
-#include "CairoTTY.h"
-
-class CodepageTableParseException : public std::runtime_error
-{
-    using std::runtime_error::runtime_error;
-};
-
-class CodepageTranslator : public ICodepageTranslator
+class AsciiCodepageTranslator : public ICodepageTranslator
 {
 public:
-    explicit CodepageTranslator(const std::string &tableName);
-
     virtual bool translate(uint8_t in, gunichar &out) override;
-
-private:
-    typedef std::map<uint8_t, gunichar> TTransTable;
-
-    TTransTable m_table;
 };
 
-#endif // CODEPAGE_TRANSLATOR_H
+#endif // ASCII_CODEPAGE_TRANSLATOR_H_

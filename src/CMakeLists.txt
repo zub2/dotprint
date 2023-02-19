@@ -3,10 +3,6 @@ add_library(dotpring-objs OBJECT
     CmdLineParser.h
     CairoTTY.cpp
     CairoTTY.h
-    AsciiCodepageTranslator.cpp
-    AsciiCodepageTranslator.h
-    CodepageTranslator.cpp
-    CodepageTranslator.h
     MarginsFactory.cpp
     MarginsFactory.h
     PageSizeFactory.cpp
@@ -19,8 +15,14 @@ add_library(dotpring-objs OBJECT
     preprocessors/CRLFPreprocessor.h
     preprocessors/EpsonPreprocessor.cpp
     preprocessors/EpsonPreprocessor.h
+    translators/AsciiCodepageTranslator.cpp
+    translators/AsciiCodepageTranslator.h
+    translators/CodepageTranslator.cpp
+    translators/CodepageTranslator.h
+    translators/IconvCodepageTranslator.cpp
+    translators/IconvCodepageTranslator.h
 )
-target_link_libraries(dotpring-objs PkgConfig::GLIBMM PkgConfig::CAIROMM)
+target_link_libraries(dotpring-objs PkgConfig::GLIBMM PkgConfig::CAIROMM Iconv::Iconv)
 
 add_executable(dotprint DotPrint.cpp)
 target_link_libraries(dotprint dotpring-objs)

@@ -1,17 +1,22 @@
 # What is it?
-dotprint is a tool that can be used to convert text files that include escape sequences for Epson dot matrix printers into PDF files.
+dotprint is a tool that can be used to convert text files that include escape sequences for Epson dot matrix printers ([ESC/P]{https://files.support.epson.com/pdf/general/escp2ref.pdf}) into PDF files.
 
 Nowadays you are not likely to come across such files often but they were common in the "bad old days" of DOS. Programs would often assume an "epson-compatible" dot matrix printer and would embed the escape sequences (for e.g. condensed or expanded font) into the output.
 
-If you want to use such files now, converting them into PDF is quite useful. You can send them to others and you can print them out on other printers than just dot matrix printers. But please note that only a few escape sequences are supported. :-(
+If you want to use such files now, converting them into PDF is quite useful. You can send them to others and you can print them out on other printers than just dot matrix printers. But please note this tool takes a naive approach and works well only for simple input files. :-(
 
 So this might be useful to you if you are still running some DOS applications, perhaps in dosemu. With some scripting you can make the old DOS applications produce PDFs.
 
-The input file encoding is expected to be a simple single byte encoding, as would be common in the DOS days. It can be specified using a translation table. E.g. if your input file is in CP850 you can run dotprint like this:
+The input file encoding is expected to be a simple single byte encoding, as would be common in the DOS days. The conversion can either be done with iconv, e.g. for CP850:
 ```
-dotprint -t tables/cp850.trans --output myfile.pdf myfile.PRN
+dotprint -T CP850 --output myfile.pdf myfile.PRN
+```
+or a custom translation table can be specified, e.g. for the non-standard not-really-CP859:
+```
+dotprint -t tables/cp895.trans --output myfile.pdf myfile.PRN
 ```
 The translation files are delivered with dotprint in the tables folder.
+
 TODO: Specifiy an installation directory for the translation tables and reference this folder here.
 
 # Compiling
@@ -21,6 +26,7 @@ First you need to install the required dependencies. These are:
 * glibmm-2.4
 * cairomm-1.0
 * boost test (optional, needed to run tests)
+* libiconv (at least on Linux a part of glibc and so it's not needed to be installed separately)
 
 In Debian/Ubuntu you can get them via:
 
@@ -45,13 +51,13 @@ You need to specify:
 
 * the input file (text input with potential escape sequences)
 * the output file (PDF)
-* unless the text in the file is pure ascii, the encoding (-t)
+* unless the text in the file is pure ascii, the encoding (-T or -t)
 
 You can specify also the preprocessor using the `-P` option. It defaults to epson. The original idea was to potentially support other printer escape codes. But currently only `epson`, `simple` and `crlf` (with the latter two not processing any escapes).
 
 A typical invocation of dotprint looks like this:
 
-    dotprint input-file.txt -o output-file.pdf
+    dotprint input-file.txt -T CPnnn -o output-file.pdf
 
 Run `dotprint -h` for a list of all the options.
 
