@@ -1,5 +1,5 @@
 # What is it?
-dotprint is a tool that can be used to convert text files that include escape sequences for Epson dot matrix printers ([ESC/P]{https://files.support.epson.com/pdf/general/escp2ref.pdf}) into PDF files.
+dotprint is a tool that can be used to convert text files that include escape sequences for Epson dot matrix printers ([ESC/P](https://files.support.epson.com/pdf/general/escp2ref.pdf)) into PDF files.
 
 Nowadays you are not likely to come across such files often but they were common in the "bad old days" of DOS. Programs would often assume an "epson-compatible" dot matrix printer and would embed the escape sequences (for e.g. condensed or expanded font) into the output.
 
